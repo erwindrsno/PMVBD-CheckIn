@@ -9,11 +9,11 @@ import (
 )
 
 type Event struct {
-	Id        uuid.UUID
-	Name      string
-	Status    Status
-	CreatedAt time.Time
-	StartedAt time.Time
+	Id        uuid.UUID `json:"id"`
+	Name      string    `json:"name"`
+	Status    Status    `json:"status"`
+	CreatedAt time.Time `json:"created_at"`
+	StartedAt time.Time `json:"started_at"`
 }
 
 type Store interface {
