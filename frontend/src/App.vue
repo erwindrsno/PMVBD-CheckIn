@@ -4,7 +4,7 @@ import SchoolList from './components/school_list.vue';
 import EventList from './components/event_list.vue';
 import AttendeeList from './components/attendee_list.vue';
 
-const currentView = ref('school');
+const currentView = ref('attendee');
 </script>
 
 <template>
