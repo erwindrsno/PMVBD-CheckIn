@@ -59,6 +59,7 @@ func (a *App) setRoutes() {
 		schools := api.Group("/schools")
 		{
 			schools.GET("", schoolHandler.Read)
+			schools.POST("", schoolHandler.Create)
 		}
 
 		events := api.Group("/events")

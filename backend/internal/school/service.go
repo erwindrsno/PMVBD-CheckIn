@@ -13,7 +13,14 @@ func NewService(st Store) *Service {
 	return s
 }
 
-// func (s *Service) Create() ()
+func (s *Service) Create(name string) error {
+	err := s.st.Insert(name)
+	if err != nil {
+		slog.Error("Database failure in Service.Create", "error", err)
+		return ErrInternal
+	}
+	return nil
+}
 
 func (s *Service) Read() ([]School, error) {
 	res, err := s.st.GetAll()

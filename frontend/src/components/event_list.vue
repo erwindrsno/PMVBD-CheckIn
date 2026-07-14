@@ -1,46 +1,84 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
-// 1. Add these state variables so the template knows what "dialog" and "newEvent" are
+// --- State ---
 const dialog = ref(false);
+const loading = ref(false);
+const events = ref([]);
 const newEvent = ref({ name: '' });
 
 const headers = [
-  { title: 'No.', key: 'id' },
+  { title: 'No.', key: 'idx' }, // Uses index slot
   { title: 'Name', key: 'name' },
   { title: 'Status', key: 'status' },
+  { title: 'Created at', key: 'created_at' },
+  { title: 'Started at', key: 'started_at' },
   { title: 'Action', key: 'action' }
 ];
 
-const events = ref([
-  { id: 1, name: 'Science Fair', status: 'Upcoming', action: '-' }
-]);
-
-// 2. Define the saveEvent function
-const saveEvent = () => {
-  const newId = events.value.length + 1;
-  events.value.push({
-    id: newId,
-    name: newEvent.value.name,
-    status: 'Upcoming',
-    action: '-'
-  });
-
-  // Reset and close
-  newEvent.value = { name: '' };
-  dialog.value = false;
+// --- API Logic ---
+const fetchEvents = async () => {
+  loading.value = true;
+  try {
+    // Replace with your actual events endpoint
+    const response = await fetch('http://localhost:8080/api/v1/events');
+    const result = await response.json();
+    events.value = result.data.events || [];
+  } catch (error) {
+    console.error('Error fetching events:', error);
+  } finally {
+    loading.value = false;
+  }
 };
+
+const saveEvent = async () => {
+  try {
+    const response = await fetch('http://localhost:8080/api/v1/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newEvent.value),
+    });
+
+    if (response.ok) {
+      await fetchEvents(); // Refresh list
+      dialog.value = false;
+      newEvent.value = { name: '' };
+    }
+  } catch (error) {
+    console.error('Error saving event:', error);
+  }
+};
+
+// --- Lifecycle ---
+onMounted(() => {
+  fetchEvents();
+});
 </script>
 
 <template>
   <div class="d-flex justify-space-between align-center mb-4">
     <h1>Event List</h1>
-    <!-- Now 'dialog' is defined, so this will work -->
     <v-btn color="primary" @click="dialog = true">Add New Event</v-btn>
   </div>
 
-  <v-data-table :headers="headers" :items="events" class="elevation-1"></v-data-table>
+  <v-data-table
+    :headers="headers"
+    :items="events"
+    :loading="loading"
+    class="elevation-1"
+  >
+    <!-- Incrementing Index -->
+    <template v-slot:item.idx="{ index }">
+      {{ index + 1 }}
+    </template>
 
+    <!-- Handling Name mapping (Assuming Go struct has `json:"name"`) -->
+    <template v-slot:item.action="{ item }">
+      <v-btn size="small" variant="text" color="error">Delete</v-btn>
+    </template>
+  </v-data-table>
+
+  <!-- Add Event Dialog -->
   <v-dialog v-model="dialog" max-width="500px">
     <v-card>
       <v-card-title>Add New Event</v-card-title>

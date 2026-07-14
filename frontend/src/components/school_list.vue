@@ -18,7 +18,6 @@ const fetchSchools = async () => {
   try {
     const response = await fetch('http://localhost:8080/api/v1/schools');
     const result = await response.json();
-    console.log(result)
     // Assuming backend returns { "data": { "schools": [...] } }
     schools.value = result.data.schools || [];
   } catch (error) {
