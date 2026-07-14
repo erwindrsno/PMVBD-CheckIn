@@ -37,3 +37,7 @@ frontend/__screenshots__/
 
 # Frontend Vite
 frontend/*.timestamp-*-*.mjs
+
+
+backend/pmvbd-checkin.db
+backend/.env

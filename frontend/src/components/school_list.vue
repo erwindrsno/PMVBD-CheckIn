@@ -1,26 +1,55 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
-const dialog = ref(false); // Controls the dialog visibility
-const headers = [
-  { title: 'No.', key: 'id' },
-  { title: 'School Name', key: 'name' },
-  { title: 'Location', key: 'location' },
-  { title: 'Contact', key: 'contact' }
-];
-const schools = ref([
-  { id: '1', name: 'SMA Negeri 1 Karimun', location: 'Karimun', contact: '0812...' }
-]);
-
-// New school form state
+// --- State ---
+const dialog = ref(false);
+const loading = ref(false);
+const schools = ref([]);
 const newSchool = ref({ name: '', location: '', contact: '' });
 
-const saveSchool = () => {
-  // Add logic to save to your Go backend here later
-  schools.value.push({ ...newSchool.value });
-  dialog.value = false; // Close dialog
-  newSchool.value = { name: '', location: '', contact: '' }; // Reset form
+const headers = [
+  { title: 'No.', key: 'idx' },
+  { title: 'School Name', key: 'name' },
+];
+
+// --- API Logic ---
+const fetchSchools = async () => {
+  loading.value = true;
+  try {
+    const response = await fetch('http://localhost:8080/api/v1/schools');
+    const result = await response.json();
+    console.log(result)
+    // Assuming backend returns { "data": { "schools": [...] } }
+    schools.value = result.data.schools || [];
+  } catch (error) {
+    console.error('Error fetching schools:', error);
+  } finally {
+    loading.value = false;
+  }
 };
+
+const saveSchool = async () => {
+  try {
+    const response = await fetch('http://localhost:8080/api/v1/schools', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newSchool.value),
+    });
+
+    if (response.ok) {
+      await fetchSchools(); // Refresh the list
+      dialog.value = false;
+      newSchool.value = { name: '', location: '', contact: '' };
+    }
+  } catch (error) {
+    console.error('Error saving school:', error);
+  }
+};
+
+// --- Lifecycle ---
+onMounted(() => {
+  fetchSchools();
+});
 </script>
 
 <template>
@@ -29,7 +58,21 @@ const saveSchool = () => {
     <v-btn color="primary" @click="dialog = true">Add New School</v-btn>
   </div>
 
-  <v-data-table :headers="headers" :items="schools" :items-per-page="5" class="elevation-1"></v-data-table>
+  <v-data-table
+    :headers="headers"
+    :items="schools"
+    :loading="loading"
+    :items-per-page="5"
+    class="elevation-1"
+  >
+    <!-- Optional: Add a loading overlay -->
+    <template v-slot:item.idx="{ index }">
+      {{ index + 1 }}
+    </template>
+    <template v-slot:loading>
+      <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
+    </template>
+  </v-data-table>
 
   <!-- Add School Dialog -->
   <v-dialog v-model="dialog" max-width="500px">
