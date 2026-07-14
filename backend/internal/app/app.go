@@ -65,6 +65,7 @@ func (a *App) setRoutes() {
 		events := api.Group("/events")
 		{
 			events.GET("", eventHandler.Read)
+			events.POST("", eventHandler.Create)
 		}
 	}
 

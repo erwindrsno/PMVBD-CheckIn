@@ -61,20 +61,42 @@ onMounted(() => {
     <v-btn color="primary" @click="dialog = true">Add New Event</v-btn>
   </div>
 
-  <v-data-table
+<v-data-table
     :headers="headers"
     :items="events"
     :loading="loading"
     class="elevation-1"
   >
+    <template v-slot:header.action>
+      <div class="text-center">Action</div>
+    </template>
     <!-- Incrementing Index -->
     <template v-slot:item.idx="{ index }">
       {{ index + 1 }}
     </template>
 
-    <!-- Handling Name mapping (Assuming Go struct has `json:"name"`) -->
+    <!-- Refactored Action Column -->
     <template v-slot:item.action="{ item }">
-      <v-btn size="small" variant="text" color="error">Delete</v-btn>
+      <div class="d-flex justify-center gap-2">
+        <v-btn
+          icon
+          variant="text"
+          size="small"
+          color="primary"
+          @click="editEvent(item)"
+        >
+         <v-icon>mdi-pencil</v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          variant="text"
+          size="small"
+          color="error"
+          @click="deleteEvent(item.id)"
+        >
+        <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </div>
     </template>
   </v-data-table>
 

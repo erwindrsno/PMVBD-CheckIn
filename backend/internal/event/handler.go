@@ -18,6 +18,23 @@ func NewHandler(s *Service) *Handler {
 	return h
 }
 
+func (h *Handler) Create(c *gin.Context) {
+	var req struct {
+		Name string `json:"name" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		responses.Fail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := h.s.Create(req.Name); err != nil {
+		responses.Fail(c, http.StatusBadRequest, err.Error())
+	} else {
+		responses.Success(c, http.StatusCreated, gin.H{"success": true})
+	}
+}
+
 func (h *Handler) Read(c *gin.Context) {
 	datas, err := h.s.Read()
 	if err != nil {
