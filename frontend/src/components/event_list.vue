@@ -102,6 +102,7 @@ onMounted(() => {
     <template v-slot:item.action="{ item }">
       <div class="d-flex justify-center gap-2">
         <v-btn
+          disabled
           icon
           variant="text"
           size="small"

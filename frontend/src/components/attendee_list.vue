@@ -76,7 +76,7 @@
         <v-icon>mdi-eye</v-icon>
       </v-btn>
 
-      <v-btn icon variant="text" size="small" color="primary" @click="editEvent(item)">
+      <v-btn disabled icon variant="text" size="small" color="primary" @click="editEvent(item)">
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
 
