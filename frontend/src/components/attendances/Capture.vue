@@ -1,0 +1,76 @@
+<script setup>
+import { ref } from 'vue';
+
+const inputID = ref('');
+const currentAttendee = ref(null);
+const selectedEvent = ref(null);
+
+// Placeholder for your event list
+const events = ref([
+  { id: 1, name: 'Organization ABC - Annual Meetup' },
+  { id: 2, name: 'Karimun Tech Seminar 2026' }
+]);
+
+const handleScan = () => {
+  if (!inputID.value) return;
+
+  // Simulate API call
+  currentAttendee.value = {
+    name: "John Doe",
+    public_id: inputID.value,
+    school: "SMA Negeri 1 Karimun"
+  };
+
+  inputID.value = '';
+};
+</script>
+
+<template>
+  <v-container max-width="600">
+    <h1 class="text-h4 mb-6">Capture Attendance</h1>
+
+    <!-- Dropdown for Event Selection -->
+    <v-select
+      v-model="selectedEvent"
+      :items="events"
+      item-title="name"
+      item-value="id"
+      label="Select Open Event"
+      variant="outlined"
+      class="mb-4"
+      prepend-inner-icon="mdi-calendar-check"
+      return-object
+    ></v-select>
+
+    <!-- State Display -->
+    <v-card class="mb-6" min-height="200">
+      <v-card-text class="pa-3">
+        <div v-if="!currentAttendee" class="text-center mt-10 text-grey">
+          <v-icon size="64" color="grey-lighten-1" class="mb-4">mdi-qrcode-scan</v-icon>
+          <p class="text-h6">Waiting for input...</p>
+          <p>Please select an event and scan a QR code.</p>
+        </div>
+
+        <div v-else>
+          <h2 class="text-h5 mb-4 text-primary text-center">Attendee Found!</h2>
+          <v-list density="comfortable">
+            <v-list-item title="Name" :subtitle="currentAttendee.name"></v-list-item>
+            <v-list-item title="ID" :subtitle="currentAttendee.public_id"></v-list-item>
+            <v-list-item title="School" :subtitle="currentAttendee.school"></v-list-item>
+          </v-list>
+        </div>
+      </v-card-text>
+    </v-card>
+
+    <!-- Input Section -->
+    <v-text-field
+      v-model="inputID"
+      label="Scan or Enter Attendee ID"
+      variant="outlined"
+      autofocus
+      prepend-inner-icon="mdi-barcode-scan"
+      @keyup.enter="handleScan"
+      :disabled="!selectedEvent"
+    ></v-text-field>
+  </v-container>
+</template>

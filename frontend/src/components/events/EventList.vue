@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import EventDialog from './EventDialog.vue';
+import AddEventDialog from './AddEventDialog.vue';
 import StatusConfirmDialog from './StatusConfirmDialog.vue';
 import DeleteConfirmDialog from './DeleteConfirmDialog.vue';
 import { useEventStatus } from '../../composables/useEventStatus.js';
@@ -174,7 +174,7 @@ onMounted(() => {
   </v-data-table>
 
   <!-- Add Event Dialog -->
-  <EventDialog
+  <AddEventDialog
     v-model="dialog"
     :new-event="newEvent"
     @save="saveEvent"

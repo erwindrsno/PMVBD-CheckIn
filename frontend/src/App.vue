@@ -1,8 +1,9 @@
 <script setup>
 import { ref } from 'vue';
-import SchoolList from './components/SchoolList.vue';
+import SchoolList from './components/schools/SchoolList.vue';
 import EventList from './components/events/EventList.vue';
 import AttendeeList from './components/attendees/AttendeeList.vue';
+import Capture from './components/attendances/Capture.vue';
 
 const currentView = ref('attendee');
 </script>
@@ -25,6 +26,7 @@ const currentView = ref('attendee');
         <SchoolList v-if="currentView === 'school'" />
         <EventList v-else-if="currentView === 'event'" />
         <AttendeeList v-else-if="currentView === 'attendee'" />
+        <Capture v-else-if="currentView === 'attendance'" />
         <div v-else><h1>Select a module</h1></div>
       </v-container>
     </v-main>
