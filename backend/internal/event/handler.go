@@ -5,6 +5,7 @@ import (
 
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/responses"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type Handler struct {
@@ -41,4 +42,15 @@ func (h *Handler) Read(c *gin.Context) {
 		responses.Fail(c, http.StatusInternalServerError, err.Error())
 	}
 	responses.Success(c, http.StatusOK, gin.H{"events": datas})
+}
+
+func (h *Handler) UpdateStatus(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		responses.Fail(c, http.StatusInternalServerError, err.Error())
+	}
+	if err := h.s.UpdateStatus(id); err != nil {
+		responses.Fail(c, http.StatusInternalServerError, err.Error())
+	}
 }

@@ -1,6 +1,6 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue';
-  import ViewDetailDialog from './events/ViewDetailDialog.vue';
+  import ViewDetailDialog from './ViewDetailDialog.vue';
 
   // --- State ---
   const dialog = ref(false);

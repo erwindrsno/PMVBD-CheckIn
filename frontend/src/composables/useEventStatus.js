@@ -6,7 +6,7 @@ export function useEventStatus() {
 
   const statusMap = {
     0: { label: 'New', color: 'warning' },
-    1: { label: 'Active', color: 'primary' },
+    1: { label: 'Open', color: 'primary' },
     2: { label: 'Completed', color: 'success' },
     3: { label: 'Cancelled', color: 'error' },
   };

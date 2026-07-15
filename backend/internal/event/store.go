@@ -20,7 +20,7 @@ type Store interface {
 	Insert(payload Event) error
 	GetListView() ([]Event, error)
 	GetPaginatedListView(limit, offset int) ([]Event, error)
-	UpdateStatus(id uuid.UUID, status Status) error
+	UpdateStatus(id uuid.UUID) error
 }
 
 type SQLiteStore struct {
@@ -104,22 +104,34 @@ func (s *SQLiteStore) GetListView() ([]Event, error) {
 	return es, nil
 }
 
-func (s *SQLiteStore) UpdateStatus(id uuid.UUID, status Status) error {
-	var err error
-	if status == Open {
+func (s *SQLiteStore) UpdateStatus(id uuid.UUID) error {
+	// 1. Get current status
+	var currentStatus Status
+	err := s.db.QueryRow("SELECT status FROM events WHERE id = ?", id.String()).Scan(&currentStatus)
+	if err != nil {
+		return err
+	}
+
+	// 2. Increment status
+	nextStatus := currentStatus + 1
+
+	// 3. Prepare query
+	// If next status is Open (assuming 1), we set started_at
+	if nextStatus == Open {
 		query := `
-			UPDATE events 
-			SET status = ?, started_at = ? 
-			WHERE id = ?
-		`
-		_, err = s.db.Exec(query, int(status), time.Now().Format("2006-01-02 15:04:05"), id.String())
+            UPDATE events 
+            SET status = ?, started_at = ? 
+            WHERE id = ?
+        `
+		_, err = s.db.Exec(query, int(nextStatus), time.Now().Format("2006-01-02 15:04:05"), id.String())
 	} else {
 		query := `
-			UPDATE events 
-			SET status = ? 
-			WHERE id = ?
-		`
-		_, err = s.db.Exec(query, int(status), id.String())
+            UPDATE events 
+            SET status = ? 
+            WHERE id = ?
+        `
+		_, err = s.db.Exec(query, int(nextStatus), id.String())
 	}
+
 	return err
 }

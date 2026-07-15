@@ -52,3 +52,11 @@ func (s *Service) Read() ([]Event, error) {
 		return res, nil
 	}
 }
+
+func (s *Service) UpdateStatus(id uuid.UUID) error {
+	if err := s.st.UpdateStatus(id); err != nil {
+		slog.Error("Database failure in Service.UpdateStatus", "error", err)
+		return ErrInternal
+	}
+	return nil
+}

@@ -17,7 +17,7 @@ func (s Status) String() string {
 	case Open:
 		return "Open"
 	case Closed:
-		return "Closed"
+		return "Completed"
 	default:
 		return "Unknown"
 	}

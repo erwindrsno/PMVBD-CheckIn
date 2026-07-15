@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import SchoolList from './components/SchoolList.vue';
 import EventList from './components/events/EventList.vue';
-import AttendeeList from './components/AttendeeList.vue';
+import AttendeeList from './components/attendees/AttendeeList.vue';
 
 const currentView = ref('attendee');
 </script>
