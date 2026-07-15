@@ -1,5 +1,14 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
+import EventDialog from './EventDialog.vue';
+import StatusConfirmDialog from './StatusConfirmDialog.vue';
+import { useEventStatus } from '../../composables/useEventStatus.js';
+import { 
+  fetchEvents as apiFetchEvents, 
+  saveEvent as apiSaveEvent, 
+  updateEventStatus as apiUpdateEventStatus, 
+  deleteEvent as apiDeleteEvent 
+} from '../../services/eventServices.js';
 
 // --- State ---
 const dialog = ref(false);
@@ -7,34 +16,8 @@ const loading = ref(false);
 const events = ref([]);
 const newEvent = ref({ name: '' });
 
-const statusDialog = ref(false);
-const itemToChange = ref(null);
-
-const statusMessage = computed(() => {
-  if (!itemToChange.value) return '';
-
-  // Replace 'status' with whatever your property name is (e.g., item.status)
-  if (itemToChange.value.status === 0) {
-    return 'Are you sure you want to promote this attendee to "Open" status?';
-  } else if (itemToChange.value.status === 1) {
-    return 'Are you sure you want to close this registration?';
-  }
-  return 'Are you sure you want to change this status?';
-});
-
-const changeEventStatus = (item) => {
-  itemToChange.value = item;
-  statusDialog.value = true;
-};
-
-// The action after confirming
-const confirmStatusChange = async () => {
-  // Perform your API call here using itemToChange.value
-  console.log("Changing status for:", itemToChange.value.id);
-
-  statusDialog.value = false;
-  itemToChange.value = null; // Reset
-};
+// --- Composable ---
+const { statusDialog, itemToChange, statusMessage, statusMap, openStatusDialog } = useEventStatus();
 
 const headers = [
   { title: 'No.', key: 'idx' }, // Uses index slot
@@ -45,22 +28,12 @@ const headers = [
   { title: 'Action', key: 'action', align: 'center' }
 ];
 
-const statusMap = {
-  0: { label: 'New', color: 'warning' },
-  1: { label: 'Active', color: 'primary' },
-  2: { label: 'Completed', color: 'success' },
-  3: { label: 'Cancelled', color: 'error' },
-};
-
 // --- API Logic ---
 const fetchEvents = async () => {
   loading.value = true;
   try {
-    // Replace with your actual events endpoint
-    const response = await fetch('http://localhost:8080/api/v1/events');
-    const result = await response.json();
-    console.log(result)
-    events.value = result.data.events || [];
+    const result = await apiFetchEvents();
+    events.value = result.data?.events || result || [];
   } catch (error) {
     console.error('Error fetching events:', error);
   } finally {
@@ -70,13 +43,8 @@ const fetchEvents = async () => {
 
 const saveEvent = async () => {
   try {
-    const response = await fetch('http://localhost:8080/api/v1/events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newEvent.value),
-    });
-
-    if (response.ok) {
+    const success = await apiSaveEvent(newEvent.value);
+    if (success) {
       await fetchEvents(); // Refresh list
       dialog.value = false;
       newEvent.value = { name: '' };
@@ -84,6 +52,40 @@ const saveEvent = async () => {
   } catch (error) {
     console.error('Error saving event:', error);
   }
+};
+
+// The action after confirming
+const confirmStatusChange = async () => {
+  if (!itemToChange.value) return;
+  try {
+    const nextStatus = itemToChange.value.status === 0 ? 1 : 2; // Example promotion transition
+    const success = await apiUpdateEventStatus(itemToChange.value.id, nextStatus);
+    if (success) {
+      await fetchEvents();
+    }
+  } catch (error) {
+    console.error('Error changing status:', error);
+  } finally {
+    statusDialog.value = false;
+    itemToChange.value = null; // Reset
+  }
+};
+
+const deleteEvent = async (id) => {
+  if (confirm('Are you sure you want to delete this event?')) {
+    try {
+      const success = await apiDeleteEvent(id);
+      if (success) {
+        await fetchEvents();
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error);
+    }
+  }
+};
+
+const editEvent = (item) => {
+  console.log('Edit event:', item);
 };
 
 // --- Lifecycle ---
@@ -98,12 +100,12 @@ onMounted(() => {
     <v-btn color="primary" @click="dialog = true">Add New Event</v-btn>
   </div>
 
-<v-data-table
+  <v-data-table
     :headers="headers"
     :items="events"
     :loading="loading"
     class="elevation-1"
-    >
+  >
     <template v-slot:header.status>
       <div class="text-center">Status</div>
     </template>
@@ -132,10 +134,10 @@ onMounted(() => {
           variant="text"
           size="small"
           color="primary"
-          @click="changeEventStatus(item)"
+          @click="openStatusDialog(item)"
           :disabled="item.status === 2"
         >
-         <v-icon>mdi-cog-refresh</v-icon>
+          <v-icon>mdi-cog-refresh</v-icon>
         </v-btn>
         <v-btn
           disabled
@@ -154,38 +156,23 @@ onMounted(() => {
           color="error"
           @click="deleteEvent(item.id)"
         >
-        <v-icon>mdi-delete</v-icon>
+          <v-icon>mdi-delete</v-icon>
         </v-btn>
-        </div>
+      </div>
     </template>
   </v-data-table>
 
   <!-- Add Event Dialog -->
-  <v-dialog v-model="dialog" max-width="500px">
-    <v-card>
-      <v-card-title>Add New Event</v-card-title>
-      <v-card-text>
-        <v-text-field v-model="newEvent.name" label="Event Name"></v-text-field>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="grey" @click="dialog = false">Cancel</v-btn>
-        <v-btn color="primary" @click="saveEvent">Save</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <EventDialog
+    v-model="dialog"
+    :new-event="newEvent"
+    @save="saveEvent"
+  />
 
-  <v-dialog v-model="statusDialog" max-width="400px">
-    <v-card>
-      <v-card-title class="bg-warning">Confirm Status Change</v-card-title>
-      <v-card-text class="mt-4">
-        {{ statusMessage }}
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="grey" @click="statusDialog = false">Cancel</v-btn>
-        <v-btn color="primary" @click="confirmStatusChange">Yes, Confirm</v-btn>
-      </v-card-actions>
-    </v-card>
-    </v-dialog>
+  <!-- Status Confirm Dialog -->
+  <StatusConfirmDialog
+    v-model="statusDialog"
+    :status-message="statusMessage"
+    @confirm="confirmStatusChange"
+  />
 </template>
