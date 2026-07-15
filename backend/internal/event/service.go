@@ -60,3 +60,11 @@ func (s *Service) UpdateStatus(id uuid.UUID) error {
 	}
 	return nil
 }
+
+func (s *Service) Delete(id uuid.UUID) error {
+	if err := s.st.Delete(id); err != nil {
+		slog.Error("Database failure in Service.Delete", "error", err)
+		return ErrInternal
+	}
+	return nil
+}

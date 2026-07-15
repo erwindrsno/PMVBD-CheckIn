@@ -2,6 +2,7 @@ package event
 
 import (
 	"database/sql"
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -21,6 +22,7 @@ type Store interface {
 	GetListView() ([]Event, error)
 	GetPaginatedListView(limit, offset int) ([]Event, error)
 	UpdateStatus(id uuid.UUID) error
+	Delete(id uuid.UUID) error
 }
 
 type SQLiteStore struct {
@@ -134,4 +136,29 @@ func (s *SQLiteStore) UpdateStatus(id uuid.UUID) error {
 	}
 
 	return err
+}
+
+func (s *SQLiteStore) Delete(id uuid.UUID) error {
+	// 1. Prepare the SQL statement
+	query := `DELETE FROM events WHERE id = ?`
+
+	// 2. Execute the query
+	// We convert the UUID to a string to match the SQLite storage format
+	result, err := s.db.Exec(query, id.String())
+	if err != nil {
+		return err
+	}
+
+	// 3. Optional: Check if a row was actually deleted
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		// This can happen if the ID doesn't exist
+		return fmt.Errorf("no event found with id %s", id.String())
+	}
+
+	return nil
 }

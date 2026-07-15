@@ -85,6 +85,7 @@ func (a *App) setRoutes() {
 			events.GET("", eventHandler.Read)
 			events.POST("", eventHandler.Create)
 			events.PATCH(":id/status", eventHandler.UpdateStatus)
+			events.DELETE(":id", eventHandler.Delete)
 		}
 
 		attendees := api.Group("/attendees")

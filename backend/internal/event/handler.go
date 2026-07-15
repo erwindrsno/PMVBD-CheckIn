@@ -54,3 +54,14 @@ func (h *Handler) UpdateStatus(c *gin.Context) {
 		responses.Fail(c, http.StatusInternalServerError, err.Error())
 	}
 }
+
+func (h *Handler) Delete(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		responses.Fail(c, http.StatusInternalServerError, err.Error())
+	}
+	if err := h.s.Delete(id); err != nil {
+		responses.Fail(c, http.StatusInternalServerError, err.Error())
+	}
+}

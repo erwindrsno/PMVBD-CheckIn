@@ -2,12 +2,13 @@
 import { ref, onMounted } from 'vue';
 import EventDialog from './EventDialog.vue';
 import StatusConfirmDialog from './StatusConfirmDialog.vue';
+import DeleteConfirmDialog from './DeleteConfirmDialog.vue';
 import { useEventStatus } from '../../composables/useEventStatus.js';
-import { 
-  fetchEvents as apiFetchEvents, 
-  saveEvent as apiSaveEvent, 
-  updateEventStatus as apiUpdateEventStatus, 
-  deleteEvent as apiDeleteEvent 
+import {
+  fetchEvents as apiFetchEvents,
+  saveEvent as apiSaveEvent,
+  updateEventStatus as apiUpdateEventStatus,
+  deleteEvent as apiDeleteEvent
 } from '../../services/eventServices.js';
 
 // --- State ---
@@ -15,6 +16,9 @@ const dialog = ref(false);
 const loading = ref(false);
 const events = ref([]);
 const newEvent = ref({ name: '' });
+
+const deleteDialog = ref(false);
+const itemToDelete = ref(null);
 
 // --- Composable ---
 const { statusDialog, itemToChange, statusMessage, statusMap, openStatusDialog } = useEventStatus();
@@ -71,16 +75,23 @@ const confirmStatusChange = async () => {
   }
 };
 
-const deleteEvent = async (id) => {
-  if (confirm('Are you sure you want to delete this event?')) {
-    try {
-      const success = await apiDeleteEvent(id);
-      if (success) {
-        await fetchEvents();
-      }
-    } catch (error) {
-      console.error('Error deleting event:', error);
+const openDeleteDialog = (item) => {
+  itemToDelete.value = item;
+  deleteDialog.value = true;
+};
+
+const confirmDelete = async () => {
+  if (!itemToDelete.value) return;
+  try {
+    const success = await apiDeleteEvent(itemToDelete.value.id);
+    if (success) {
+      await fetchEvents();
     }
+  } catch (error) {
+    console.error('Error deleting event:', error);
+  } finally {
+    deleteDialog.value = false;
+    itemToDelete.value = null;
   }
 };
 
@@ -154,7 +165,7 @@ onMounted(() => {
           variant="text"
           size="small"
           color="error"
-          @click="deleteEvent(item.id)"
+          @click="openDeleteDialog(item)"
         >
           <v-icon>mdi-delete</v-icon>
         </v-btn>
@@ -174,5 +185,12 @@ onMounted(() => {
     v-model="statusDialog"
     :status-message="statusMessage"
     @confirm="confirmStatusChange"
+  />
+
+  <!-- Delete Confirm Dialog -->
+  <DeleteConfirmDialog
+    v-model="deleteDialog"
+    :event-name="itemToDelete?.name || ''"
+    @confirm="confirmDelete"
   />
 </template>
