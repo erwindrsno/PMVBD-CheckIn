@@ -10,3 +10,14 @@ type AttendeeViewItem struct {
 	ContactNumber         string `json:"telp"`
 	GuardianContactNumber string `json:"guardian_telp"`
 }
+
+// http DTO
+type AddAttendeeForm struct {
+	Name                  string `json:"name"`
+	Gender                string `json:"gender"`
+	SchoolId              int    `json:"school_id"`
+	GradeId               int    `json:"grade_id"`
+	SubgradeId            int    `json:"subgrade_id"`
+	ContactNumber         string `json:"telp"`
+	GuardianContactNumber string `json:"guardian_telp"`
+}

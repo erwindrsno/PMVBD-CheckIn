@@ -2,6 +2,10 @@ package attendee
 
 import (
 	"log/slog"
+	"strings"
+
+	"github.com/google/uuid"
+	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
 type Service struct {
@@ -15,7 +19,30 @@ func NewService(st Store) *Service {
 	return s
 }
 
-func (s *Service) Create(name string) error {
+func (s *Service) Create(req AddAttendeeForm) error {
+	privateId, err := uuid.NewV7()
+	if err != nil {
+		slog.Error("faild to generate uuid", "error", err)
+	}
+	publicId, err := gonanoid.Generate("abcdefghijklmnopqrstuvwxyz123456789", 8)
+	if err != nil {
+		slog.Error("faild to generate nanoid", "error", err)
+	}
+	a := Attendee{
+		Id:                    privateId,
+		PublicId:              publicId,
+		SchoolId:              req.SchoolId,
+		Name:                  strings.ToUpper(req.Name),
+		IsMale:                parseGender(req.Gender),
+		GradeId:               req.GradeId,
+		SubGradeId:            req.SubgradeId,
+		ContactNumber:         req.ContactNumber,
+		GuardianContactNumber: req.GuardianContactNumber,
+	}
+	if err := s.st.Insert(a); err != nil {
+		slog.Error("failed to insert new attendee", "error", err)
+		return ErrInternal
+	}
 	return nil
 }
 

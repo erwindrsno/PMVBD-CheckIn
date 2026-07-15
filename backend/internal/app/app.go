@@ -7,7 +7,9 @@ import (
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/attendee"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/database"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/event"
+	"github.com/erwindrsno/PMVBD-CheckIn/internal/grade"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/school"
+	"github.com/erwindrsno/PMVBD-CheckIn/internal/subgrade"
 
 	"github.com/gin-gonic/gin"
 
@@ -60,6 +62,16 @@ func (a *App) setRoutes() {
 	attendeeService := attendee.NewService(attendeeStore)
 	attendeeHandler := attendee.NewHandler(attendeeService)
 
+	//grade definition
+	gradeStore := grade.NewSQLiteStore(a.DB)
+	gradeService := grade.NewService(gradeStore)
+	gradeHandler := grade.NewHandler(gradeService)
+
+	//subgrade definition
+	subgradeStore := subgrade.NewSQLiteStore(a.DB)
+	subgradeService := subgrade.NewService(subgradeStore)
+	subgradeHandler := subgrade.NewHandler(subgradeService)
+
 	api := a.Router.Group("/api/v1")
 	{
 		schools := api.Group("/schools")
@@ -78,6 +90,18 @@ func (a *App) setRoutes() {
 		{
 			attendees.GET("", attendeeHandler.Read)
 			attendees.POST("", attendeeHandler.Create)
+		}
+
+		grades := api.Group("/grades")
+		{
+			grades.GET("", gradeHandler.Read)
+			grades.POST("", gradeHandler.Create)
+		}
+
+		subgrades := api.Group("/subgrades")
+		{
+			subgrades.GET("", subgradeHandler.Read)
+			subgrades.POST("", subgradeHandler.Create)
 		}
 	}
 
