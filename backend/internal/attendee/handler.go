@@ -39,3 +39,10 @@ func (h *Handler) Read(c *gin.Context) {
 	}
 	responses.Success(c, http.StatusOK, gin.H{"attendees": datas})
 }
+
+func (h *Handler) Delete(c *gin.Context) {
+	publicIdParam := c.Param("public_id")
+	if err := h.s.Delete(publicIdParam); err != nil {
+		responses.Fail(c, http.StatusInternalServerError, err.Error())
+	}
+}

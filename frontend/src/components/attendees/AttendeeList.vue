@@ -1,6 +1,7 @@
 <script setup>
   import { ref, onMounted, computed } from 'vue';
   import ViewDetailDialog from './ViewDetailDialog.vue';
+  import DeleteConfirmDialog from './DeleteConfirmDialog.vue';
 
   // --- State ---
   const dialog = ref(false);
@@ -8,6 +9,8 @@
   const loading = ref(false);
   const attendees = ref([]);
   const selectedAttendee = ref(null);
+  const deleteDialog = ref(false);
+  const itemToDelete = ref(null);
 
   // Form State
   const newAttendee = ref({
@@ -42,6 +45,28 @@
   const viewDetails = (item) => {
     selectedAttendee.value = item;
     detailDialog.value = true;
+  };
+
+  const openDeleteDialog = (item) => {
+    itemToDelete.value = item;
+    deleteDialog.value = true;
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete.value) return;
+    try {
+      const response = await fetch(`http://localhost:8080/api/v1/attendees/${itemToDelete.value.public_id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        await fetchInitialData();
+      }
+    } catch (error) {
+      console.error('Error deleting attendee:', error);
+    } finally {
+      deleteDialog.value = false;
+      itemToDelete.value = null;
+    }
   };
 
   const fetchInitialData = async () => {
@@ -138,7 +163,7 @@
         <v-icon>mdi-pencil</v-icon>
       </v-btn>
 
-      <v-btn icon variant="text" size="small" color="error" @click="deleteEvent(item.id)">
+      <v-btn icon variant="text" size="small" color="error" @click="openDeleteDialog(item)">
         <v-icon>mdi-delete</v-icon>
       </v-btn>
     </template>
@@ -214,4 +239,11 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+
+  <DeleteConfirmDialog
+    v-model="deleteDialog"
+    :attendee-name="itemToDelete?.name || ''"
+    @confirm="confirmDelete"
+  />
 </template>

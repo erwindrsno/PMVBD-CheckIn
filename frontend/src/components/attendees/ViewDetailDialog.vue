@@ -1,16 +1,11 @@
 <script setup>
 defineProps({
-  modelValue: {
-    type: Boolean,
-    required: true
-  },
-  selectedAttendee: {
-    type: Object,
-    default: null
-  }
+  modelValue: { type: Boolean, required: true },
+  selectedAttendee: { type: Object, default: null }
 });
 
-defineEmits(['update:modelValue']);
+// Added 'print-qr' to the emits list
+defineEmits(['update:modelValue', 'print-qr']);
 </script>
 
 <template>
@@ -27,7 +22,18 @@ defineEmits(['update:modelValue']);
           <v-list-item title="Guardian Phone" :subtitle="selectedAttendee.guardian_telp"></v-list-item>
         </v-list>
       </v-card-text>
+
       <v-card-actions>
+        <!-- New Print QR Button -->
+        <v-btn
+          variant="flat"
+          color="secondary"
+          prepend-icon="mdi-qrcode"
+          @click="$emit('print-qr', selectedAttendee)"
+        >
+          Print QR
+        </v-btn>
+
         <v-spacer></v-spacer>
         <v-btn color="primary" @click="$emit('update:modelValue', false)">Close</v-btn>
       </v-card-actions>

@@ -55,3 +55,11 @@ func (s *Service) Read() ([]AttendeeViewItem, error) {
 		return res, nil
 	}
 }
+
+func (s *Service) Delete(id string) error {
+	if err := s.st.Delete(id); err != nil {
+		slog.Error("Database failure in Service.Delete", "error", err)
+		return ErrInternal
+	}
+	return nil
+}

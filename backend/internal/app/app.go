@@ -92,6 +92,7 @@ func (a *App) setRoutes() {
 		{
 			attendees.GET("", attendeeHandler.Read)
 			attendees.POST("", attendeeHandler.Create)
+			attendees.DELETE(":public_id", attendeeHandler.Delete)
 		}
 
 		grades := api.Group("/grades")

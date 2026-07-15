@@ -2,6 +2,7 @@ package attendee
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -23,6 +24,7 @@ type Store interface {
 	Insert(a Attendee) error
 	GetPaginatedListView(limit, offset int) ([]AttendeeViewItem, error)
 	GetListView() ([]AttendeeViewItem, error)
+	Delete(publicId string) error
 }
 
 type SQLiteStore struct {
@@ -99,4 +101,29 @@ func (r *SQLiteStore) GetListView() ([]AttendeeViewItem, error) {
 		avis = append(avis, avi)
 	}
 	return avis, nil
+}
+
+func (s *SQLiteStore) Delete(publicId string) error {
+	// 1. Prepare the SQL statement
+	query := `DELETE FROM attendees WHERE public_id = ?`
+
+	// 2. Execute the query
+	// We convert the UUID to a string to match the SQLite storage format
+	result, err := s.db.Exec(query, publicId)
+	if err != nil {
+		return err
+	}
+
+	// 3. Optional: Check if a row was actually deleted
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		// This can happen if the ID doesn't exist
+		return fmt.Errorf("no event found with id %s", publicId)
+	}
+
+	return nil
 }
