@@ -20,7 +20,7 @@ const currentView = ref('attendee');
     </v-app-bar>
 
     <v-main>
-      <v-container>
+      <v-container fluid>
         <!-- Clean Component Switching -->
         <SchoolList v-if="currentView === 'school'" />
         <EventList v-else-if="currentView === 'event'" />

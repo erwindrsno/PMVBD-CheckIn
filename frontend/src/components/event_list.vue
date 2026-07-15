@@ -16,6 +16,13 @@ const headers = [
   { title: 'Action', key: 'action' }
 ];
 
+const statusMap = {
+  0: { label: 'New', color: 'warning' },
+  1: { label: 'Active', color: 'primary' },
+  2: { label: 'Completed', color: 'success' },
+  3: { label: 'Cancelled', color: 'error' },
+};
+
 // --- API Logic ---
 const fetchEvents = async () => {
   loading.value = true;
@@ -67,12 +74,28 @@ onMounted(() => {
     :loading="loading"
     class="elevation-1"
   >
+    <template v-slot:header.status>
+      <div class="text-center">Status</div>
+    </template>
+
     <template v-slot:header.action>
       <div class="text-center">Action</div>
     </template>
     <!-- Incrementing Index -->
     <template v-slot:item.idx="{ index }">
       {{ index + 1 }}
+    </template>
+
+    <template v-slot:item.status="{ item }">
+      <div class="d-flex justify-center">
+        <v-chip
+          :color="statusMap[item.status]?.color || 'grey'"
+          size="small"
+          variant="tonal"
+        >
+          {{ statusMap[item.status]?.label || 'Unknown' }}
+        </v-chip>
+      </div>
     </template>
 
     <!-- Refactored Action Column -->

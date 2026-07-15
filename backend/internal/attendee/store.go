@@ -2,7 +2,6 @@ package attendee
 
 import (
 	"database/sql"
-	"log/slog"
 
 	"github.com/google/uuid"
 )
@@ -22,7 +21,8 @@ type Attendee struct {
 
 type Store interface {
 	Insert(a Attendee) error
-	GetListView(limit, offset int) ([]AttendeeViewItem, error)
+	GetPaginatedListView(limit, offset int) ([]AttendeeViewItem, error)
+	GetListView() ([]AttendeeViewItem, error)
 }
 
 type SQLiteStore struct {
@@ -48,7 +48,7 @@ func (r *SQLiteStore) Insert(a Attendee) error {
 	return nil
 }
 
-func (r *SQLiteStore) GetListView(limit, offset int) ([]AttendeeViewItem, error) {
+func (r *SQLiteStore) GetPaginatedListView(limit, offset int) ([]AttendeeViewItem, error) {
 	query := `
 		SELECT a.name, a.public_id, s.name, g.label, sg.name, a.contact_number, a.guardian_contact_number
 		FROM attendees a
@@ -62,14 +62,38 @@ func (r *SQLiteStore) GetListView(limit, offset int) ([]AttendeeViewItem, error)
 	var avis []AttendeeViewItem
 	rows, err := r.db.Query(query, limit, offset)
 	if err != nil {
-		slog.Error("Getting list view in repo", "error", err)
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var avi AttendeeViewItem
 		if err := rows.Scan(&avi.Name, &avi.PublicId, &avi.SchoolName, &avi.Grade, &avi.Subgrade, &avi.ContactNumber, &avi.GuardianContactNumber); err != nil {
-			slog.Error("Getting list view in repo", "error", err)
+			return nil, err
+		}
+		avis = append(avis, avi)
+	}
+	return avis, nil
+}
+
+func (r *SQLiteStore) GetListView() ([]AttendeeViewItem, error) {
+	query := `
+		SELECT a.name, a.public_id, s.name, g.label, sg.name, a.contact_number, a.guardian_contact_number
+		FROM attendees a
+		JOIN schools s ON s.id = a.school_id
+		JOIN grades g ON g.id = a.grade_id 
+		JOIN subgrades sg ON sg.id = a.subgrade_id
+		ORDER BY a.name -- Always include ORDER BY when using LIMIT
+	`
+
+	var avis []AttendeeViewItem
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var avi AttendeeViewItem
+		if err := rows.Scan(&avi.Name, &avi.PublicId, &avi.SchoolName, &avi.Grade, &avi.Subgrade, &avi.ContactNumber, &avi.GuardianContactNumber); err != nil {
 			return nil, err
 		}
 		avis = append(avis, avi)
