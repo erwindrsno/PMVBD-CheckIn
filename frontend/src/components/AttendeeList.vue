@@ -144,25 +144,6 @@
   </v-data-table>
 
   <!-- View Detail Dialog -->
-  <v-dialog v-model="detailDialog" max-width="600px">
-    <v-card v-if="selectedAttendee">
-      <v-card-title class="bg-primary text-white">Attendee Details</v-card-title>
-      <v-card-text class="mt-4">
-        <v-list density="compact">
-          <v-list-item title="Name" :subtitle="selectedAttendee.name"></v-list-item>
-          <v-list-item title="ID" :subtitle="selectedAttendee.public_id"></v-list-item>
-          <v-list-item title="School" :subtitle="selectedAttendee.school"></v-list-item>
-          <v-list-item title="Grade" :subtitle="`${selectedAttendee.grade} - ${selectedAttendee.subgrade}`"></v-list-item>
-          <v-list-item title="Phone" :subtitle="selectedAttendee.telp"></v-list-item>
-          <v-list-item title="Guardian Phone" :subtitle="selectedAttendee.guardian_telp"></v-list-item>
-        </v-list>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="primary" @click="detailDialog = false">Close</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
 
   <!-- Add Attendee Dialog -->
   <v-dialog v-model="dialog" max-width="700px">

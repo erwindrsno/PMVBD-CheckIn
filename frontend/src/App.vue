@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue';
-import SchoolList from './components/school_list.vue';
-import EventList from './components/event_list.vue';
-import AttendeeList from './components/attendee_list.vue';
+import SchoolList from './components/SchoolList.vue';
+import EventList from './components/events/EventList.vue';
+import AttendeeList from './components/AttendeeList.vue';
 
 const currentView = ref('attendee');
 </script>
