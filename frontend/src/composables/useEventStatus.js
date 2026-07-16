@@ -5,16 +5,16 @@ export function useEventStatus() {
   const itemToChange = ref(null);
 
   const statusMap = {
-    0: { label: 'New', color: 'warning' },
-    1: { label: 'Open', color: 'primary' },
-    2: { label: 'Completed', color: 'success' },
-    3: { label: 'Cancelled', color: 'error' },
+    1: { label: 'New', color: 'warning' },
+    2: { label: 'Open', color: 'primary' },
+    3: { label: 'Completed', color: 'success' },
+    4: { label: 'Cancelled', color: 'error' },
   };
 
   const statusMessage = computed(() => {
     if (!itemToChange.value) return '';
-    if (itemToChange.value.status === 0) return 'Promote to Open?';
-    if (itemToChange.value.status === 1) return 'Close registration?';
+    if (itemToChange.value.status === 1) return 'Promote to Open?';
+    if (itemToChange.value.status === 2) return 'Close registration?';
     return 'Change status?';
   });
 

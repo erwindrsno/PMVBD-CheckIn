@@ -26,8 +26,9 @@ func (s *Service) Create(name string) error {
 		return ErrInternal
 	}
 	payload := Event{
-		Id:   uuid,
-		Name: name,
+		Id:     uuid,
+		Name:   name,
+		Status: New,
 	}
 	loc, err := time.LoadLocation("Asia/Jakarta")
 	if err != nil {
@@ -43,8 +44,8 @@ func (s *Service) Create(name string) error {
 	return nil
 }
 
-func (s *Service) Read() ([]Event, error) {
-	res, err := s.st.GetListView()
+func (s *Service) Read(filter EventFilter) ([]Event, error) {
+	res, err := s.st.GetListView(filter)
 	if err != nil {
 		slog.Error("Database failure in Service.Read", "error", err)
 		return nil, ErrInternal
@@ -52,6 +53,16 @@ func (s *Service) Read() ([]Event, error) {
 		return res, nil
 	}
 }
+
+// func (s *Service) ReadByOpen() ([]Event, error) {
+// 	res, err := s.st.GetListViewByOpen()
+// 	if err != nil {
+// 		slog.Error("Database failure in Service.Read", "error", err)
+// 		return nil, ErrInternal
+// 	} else {
+// 		return res, nil
+// 	}
+// }
 
 func (s *Service) UpdateStatus(id uuid.UUID) error {
 	if err := s.st.UpdateStatus(id); err != nil {

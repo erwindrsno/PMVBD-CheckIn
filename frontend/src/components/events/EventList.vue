@@ -62,7 +62,7 @@ const saveEvent = async () => {
 const confirmStatusChange = async () => {
   if (!itemToChange.value) return;
   try {
-    const nextStatus = itemToChange.value.status === 0 ? 1 : 2; // Example promotion transition
+    const nextStatus = itemToChange.value.status === 1 ? 2 : 3; // Example promotion transition
     const success = await apiUpdateEventStatus(itemToChange.value.id, nextStatus);
     if (success) {
       await fetchEvents();
@@ -146,7 +146,7 @@ onMounted(() => {
           size="small"
           color="primary"
           @click="openStatusDialog(item)"
-          :disabled="item.status === 2"
+          :disabled="item.status === 3"
         >
           <v-icon>mdi-cog-refresh</v-icon>
         </v-btn>

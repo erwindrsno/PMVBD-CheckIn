@@ -1,15 +1,26 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const inputID = ref('');
 const currentAttendee = ref(null);
 const selectedEvent = ref(null);
+const events = ref([]); // Start as an empty array
 
-// Placeholder for your event list
-const events = ref([
-  { id: 1, name: 'Organization ABC - Annual Meetup' },
-  { id: 2, name: 'Karimun Tech Seminar 2026' }
-]);
+// Function to fetch events from your API
+const fetchOpenEvents = async () => {
+  try {
+    // Make sure the URL matches your route group /api/v1/events
+    const response = await fetch('http://localhost:8080/api/v1/events?status=open');
+    if (!response.ok) throw new Error('Failed to fetch events');
+
+    const results = await response.json();
+
+    // Assuming your API returns { "events": [...] } based on your handler
+    events.value = results.data.events || [];
+  } catch (error) {
+    console.error("Error loading events:", error);
+  }
+};
 
 const handleScan = () => {
   if (!inputID.value) return;
@@ -23,6 +34,11 @@ const handleScan = () => {
 
   inputID.value = '';
 };
+
+
+onMounted(() => {
+  fetchOpenEvents();
+});
 </script>
 
 <template>

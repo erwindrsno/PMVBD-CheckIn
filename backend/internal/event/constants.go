@@ -3,9 +3,9 @@ package event
 type Status int
 
 const (
-	New = iota
+	New = iota + 1
 	Open
-	Closed
+	Completed
 	Unknown
 )
 
@@ -16,7 +16,7 @@ func (s Status) String() string {
 		return "New"
 	case Open:
 		return "Open"
-	case Closed:
+	case Completed:
 		return "Completed"
 	default:
 		return "Unknown"

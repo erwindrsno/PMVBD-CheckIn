@@ -37,7 +37,20 @@ func (h *Handler) Create(c *gin.Context) {
 }
 
 func (h *Handler) Read(c *gin.Context) {
-	datas, err := h.s.Read()
+	statusQuery := c.Query("status") // captures '?status=open'
+
+	filter := EventFilter{}
+	if statusQuery != "" {
+		if val, ok := statusMap[statusQuery]; ok {
+			filter.Status = &val
+		} else {
+			// Handle invalid status (optional)
+			responses.Fail(c, http.StatusBadRequest, "Invalid status value")
+			return
+		}
+	}
+	// events, err := h.s.Read(filter)
+	datas, err := h.s.Read(filter)
 	if err != nil {
 		responses.Fail(c, http.StatusInternalServerError, err.Error())
 	}

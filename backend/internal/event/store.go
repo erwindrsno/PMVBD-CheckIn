@@ -19,7 +19,7 @@ type Event struct {
 
 type Store interface {
 	Insert(payload Event) error
-	GetListView() ([]Event, error)
+	GetListView(filter EventFilter) ([]Event, error)
 	GetPaginatedListView(limit, offset int) ([]Event, error)
 	UpdateStatus(id uuid.UUID) error
 	Delete(id uuid.UUID) error
@@ -77,20 +77,31 @@ func (s *SQLiteStore) GetPaginatedListView(limit, offset int) ([]Event, error) {
 	return es, nil
 }
 
-func (s *SQLiteStore) GetListView() ([]Event, error) {
+func (s *SQLiteStore) GetListView(filter EventFilter) ([]Event, error) {
 	query := `
-		SELECT e.id, e.name, e.created_at, e.started_at, e.status
-		FROM events e
-		ORDER BY e.created_at -- Always include ORDER BY when using LIMIT
-	`
+        SELECT e.id, e.name, e.created_at, e.started_at, e.status
+        FROM events e
+    `
+	var args []interface{}
 
-	var es []Event
-	rows, err := s.db.Query(query)
+	// 1. Add WHERE clause if filter exists
+	if filter.Status != nil {
+		query += " WHERE e.status = ?"
+		args = append(args, filter.Status)
+	}
+
+	// 2. Add ORDER BY (put this after the WHERE clause)
+	query += " ORDER BY e.created_at DESC" // Added DESC for better UX
+
+	// 3. PASS ARGS HERE!
+	rows, err := s.db.Query(query, args...) // <-- This is the missing piece
 	if err != nil {
 		slog.Error("Getting list view in repo", "error", err)
 		return nil, err
 	}
 	defer rows.Close()
+
+	var es []Event
 	for rows.Next() {
 		var id uuid.UUID
 		var name, createdAtStr, status string
@@ -103,8 +114,39 @@ func (s *SQLiteStore) GetListView() ([]Event, error) {
 		// Store now only handles data retrieval, not transformation
 		es = append(es, mapRowToEvent(id, name, createdAtStr, startedAtNull, status))
 	}
+
 	return es, nil
 }
+
+// func (s *SQLiteStore) GetListViewByOpen() ([]Event, error) {
+// 	query := `
+// 		SELECT e.id, e.name, e.created_at, e.started_at, e.status
+// 		FROM events e
+// 		WHERE e.status == 1
+// 		ORDER BY e.created_at -- Always include ORDER BY when using LIMIT
+// 	`
+//
+// 	var es []Event
+// 	rows, err := s.db.Query(query)
+// 	if err != nil {
+// 		slog.Error("Getting list view in repo", "error", err)
+// 		return nil, err
+// 	}
+// 	defer rows.Close()
+// 	for rows.Next() {
+// 		var id uuid.UUID
+// 		var name, createdAtStr, status string
+// 		var startedAtNull sql.NullString
+//
+// 		if err := rows.Scan(&id, &name, &createdAtStr, &startedAtNull, &status); err != nil {
+// 			return nil, err
+// 		}
+//
+// 		// Store now only handles data retrieval, not transformation
+// 		es = append(es, mapRowToEvent(id, name, createdAtStr, startedAtNull, status))
+// 	}
+// 	return es, nil
+// }
 
 func (s *SQLiteStore) UpdateStatus(id uuid.UUID) error {
 	// 1. Get current status
