@@ -52,7 +52,9 @@ const handleScan = async () => {
     currentAttendee.value = {
       name: result.data.avi.name, // Assuming your API returns attendee details
       public_id: inputID.value,
-      school: result.data.avi.school
+      school: result.data.avi.school,
+      grade: result.data.avi.grade,
+      subgrade: result.data.avi.subgrade,
     };
 
     // 4. Clear input for next scan
@@ -102,6 +104,7 @@ onMounted(() => {
             <v-list-item title="Name" :subtitle="currentAttendee.name"></v-list-item>
             <v-list-item title="ID" :subtitle="currentAttendee.public_id"></v-list-item>
             <v-list-item title="School" :subtitle="currentAttendee.school"></v-list-item>
+            <v-list-item title="Grade" :subtitle="`${currentAttendee.grade} - ${currentAttendee.subgrade}`"></v-list-item>
           </v-list>
         </div>
       </v-card-text>
