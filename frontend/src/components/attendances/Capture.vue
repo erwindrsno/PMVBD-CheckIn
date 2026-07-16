@@ -43,6 +43,10 @@ const handleScan = async () => {
       alert("⚠️ Alert: This attendee has already checked in!");
       inputID.value = ''; // Clear input
       return;
+    } else if(response.status === 404){
+      alert("⚠️ Alert: This attendee is not exist!");
+      inputID.value = ''; // Clear input
+      return;
     }
 
     const result = await response.json();

@@ -3,6 +3,7 @@ package attendee
 import (
 	"database/sql"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/uuid"
 )
@@ -128,7 +129,8 @@ func (s *SQLiteStore) GetByPublicId(publicId string) (*AttendeeViewItem, error) 
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// It's helpful to return a custom error or nil if the attendee isn't found
-			return nil, fmt.Errorf("attendee with public_id %s not found", publicId)
+			slog.Error("database no rows", "error", err.Error())
+			return nil, ErrAttendeeNotExist
 		}
 		return nil, err
 	}
