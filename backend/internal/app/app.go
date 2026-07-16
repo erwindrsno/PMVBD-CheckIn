@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log/slog"
 
+	"github.com/erwindrsno/PMVBD-CheckIn/internal/attendance"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/attendee"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/database"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/event"
@@ -72,6 +73,11 @@ func (a *App) setRoutes() {
 	subgradeService := subgrade.NewService(subgradeStore)
 	subgradeHandler := subgrade.NewHandler(subgradeService)
 
+	//attendance definition
+	attendanceStore := attendance.NewSQLiteStore(a.DB)
+	attendanceService := attendance.NewService(attendanceStore, attendeeService)
+	attendanceHandler := attendance.NewHandler(attendanceService)
+
 	api := a.Router.Group("/api/v1")
 	{
 		schools := api.Group("/schools")
@@ -93,6 +99,11 @@ func (a *App) setRoutes() {
 			attendees.GET("", attendeeHandler.Read)
 			attendees.POST("", attendeeHandler.Create)
 			attendees.DELETE(":public_id", attendeeHandler.Delete)
+		}
+
+		attendances := api.Group("/attendances")
+		{
+			attendances.POST("", attendanceHandler.Capture)
 		}
 
 		grades := api.Group("/grades")

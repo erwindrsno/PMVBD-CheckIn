@@ -56,6 +56,15 @@ func (s *Service) Read() ([]AttendeeViewItem, error) {
 	}
 }
 
+func (s *Service) ReadByPublicId(publicId string) (*AttendeeViewItem, error) {
+	res, err := s.st.GetByPublicId(publicId)
+	if err != nil {
+		slog.Error("failed to read by public id", "error", err)
+		return nil, err
+	}
+	return res, nil
+}
+
 func (s *Service) Delete(id string) error {
 	if err := s.st.Delete(id); err != nil {
 		slog.Error("Database failure in Service.Delete", "error", err)

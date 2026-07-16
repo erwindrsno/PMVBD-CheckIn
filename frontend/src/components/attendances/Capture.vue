@@ -22,17 +22,46 @@ const fetchOpenEvents = async () => {
   }
 };
 
-const handleScan = () => {
-  if (!inputID.value) return;
+const handleScan = async () => {
+  // 1. Safety checks
+  if (!inputID.value || !selectedEvent.value) return;
 
-  // Simulate API call
-  currentAttendee.value = {
-    name: "John Doe",
-    public_id: inputID.value,
-    school: "SMA Negeri 1 Karimun"
-  };
+  try {
+    // 2. Perform the POST request
+    const response = await fetch('http://localhost:8080/api/v1/attendances', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        attendee_id: inputID.value,
+        event_id: selectedEvent.value.id, // Ensure this matches your Go struct
+      }),
+    });
 
-  inputID.value = '';
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to record attendance');
+    }
+
+    const result = await response.json();
+
+    console.log(result)
+
+    // 3. Update the UI with response data
+    currentAttendee.value = {
+      name: result.data.avi.name, // Assuming your API returns attendee details
+      public_id: inputID.value,
+      school: result.data.avi.school
+    };
+
+    // 4. Clear input for next scan
+    inputID.value = '';
+
+  } catch (error) {
+    console.error("Attendance error:", error);
+    alert("Error: " + error.message);
+  }
 };
 
 
