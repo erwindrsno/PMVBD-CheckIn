@@ -1,6 +1,10 @@
 package attendance
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"github.com/mattn/go-sqlite3"
+)
 
 type Store interface {
 	Insert(payload Attendance) error
@@ -28,6 +32,11 @@ func (s *SQLiteStore) Insert(payload Attendance) error {
 	`
 	_, err := s.db.Exec(query, payload.Id.String(), payload.AttendeeId, payload.EventId, payload.ScannedAt)
 	if err != nil {
+		if sqliteErr, ok := err.(sqlite3.Error); ok {
+			if sqliteErr.Code == sqlite3.ErrConstraint {
+				return ErrDuplicateAttendance
+			}
+		}
 		return err
 	}
 	return nil

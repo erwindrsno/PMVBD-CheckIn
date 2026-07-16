@@ -31,9 +31,12 @@ func (h *Handler) Capture(c *gin.Context) {
 	if err != nil {
 		if errors.Is(err, ErrAttendeeNotExist) {
 			responses.Fail(c, http.StatusBadRequest, err.Error())
+		} else if errors.Is(err, ErrDuplicateAttendance) {
+			responses.Fail(c, http.StatusConflict, err.Error())
 		} else {
 			responses.Fail(c, http.StatusInternalServerError, err.Error())
 		}
+		return
 	}
 	responses.Success(c, http.StatusCreated, gin.H{"avi": *avi})
 }

@@ -39,9 +39,10 @@ const handleScan = async () => {
       }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to record attendance');
+    if (response.status === 409) {
+      alert("⚠️ Alert: This attendee has already checked in!");
+      inputID.value = ''; // Clear input
+      return;
     }
 
     const result = await response.json();
