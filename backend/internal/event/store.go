@@ -56,7 +56,8 @@ func (s *SQLiteStore) GetPaginatedListView(limit, offset int) ([]EventViewItem, 
 	defer rows.Close()
 	for rows.Next() {
 		var id uuid.UUID
-		var name, createdAtStr, status string
+		var name, createdAtStr string
+		var status int
 		var startedAtNull sql.NullString
 
 		if err := rows.Scan(&id, &name, &createdAtStr, &startedAtNull, &status); err != nil {
@@ -96,7 +97,8 @@ func (s *SQLiteStore) GetListView(filter EventFilter) ([]EventViewItem, error) {
 	var es []EventViewItem
 	for rows.Next() {
 		var id uuid.UUID
-		var name, createdAtStr, status string
+		var name, createdAtStr string
+		var status int
 		var startedAtNull sql.NullString
 
 		if err := rows.Scan(&id, &name, &createdAtStr, &startedAtNull, &status); err != nil {

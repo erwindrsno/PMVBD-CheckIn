@@ -1,7 +1,6 @@
 package event
 
 import (
-	"log/slog"
 	"net/http"
 
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/responses"
@@ -52,7 +51,6 @@ func (h *Handler) Read(c *gin.Context) {
 	}
 	// events, err := h.s.Read(filter)
 	datas, err := h.s.Read(filter)
-	slog.Info("get all events", "data", datas)
 	if err != nil {
 		responses.Fail(c, http.StatusInternalServerError, err.Error())
 	}
