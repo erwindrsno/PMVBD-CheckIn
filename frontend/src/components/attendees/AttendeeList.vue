@@ -34,7 +34,7 @@
   const genderOptions = ['Male', 'Female'];
 
   const headers = [
-    { title: 'No.', key: 'idx', width: '50px' },
+    { title: '#', key: 'idx', width: '50px' },
     { title: 'Name', key: 'name', width: '350px' },
     { title: 'School', key: 'school'},
     { title: 'Grade', key: 'grade'},

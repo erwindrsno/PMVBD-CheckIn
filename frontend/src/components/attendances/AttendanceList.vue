@@ -6,7 +6,7 @@ const events = ref([]); // You need to populate this from your /api/v1/events en
 const attendanceList = ref([]);
 
 const headers = [
-  { title: 'No.', key: 'idx' },
+  { title: '#', key: 'idx' },
   { title: 'Attendee Name', key: 'attendee_name' },
   { title: 'School', key: 'school_name' },
   { title: 'Grade', key: 'full_grade' },

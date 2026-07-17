@@ -8,7 +8,7 @@ const schools = ref([]);
 const newSchool = ref({ name: '', location: '', contact: '' });
 
 const headers = [
-  { title: 'No.', key: 'idx' },
+  { title: '#', key: 'idx' },
   { title: 'School Name', key: 'name' },
 ];
 

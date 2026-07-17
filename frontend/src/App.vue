@@ -11,11 +11,21 @@ const currentView = ref('attendee');
 <template>
   <v-app>
     <v-app-bar rounded>
-      <v-app-bar-title>PMVBD, Check In!</v-app-bar-title>
+      <v-app-bar-title>
+        <div class="d-flex align-center" style="min-width: 250px;">
+          <v-img
+            src="../assets/LOGO_PMV.PNG"
+            width="50"
+            height="50"
+            class="mr-3 flex-grow-0"
+            cover
+          />
+          <span>PMVBD, Check In!</span>
+        </div>
+      </v-app-bar-title>
       <template v-slot:append>
         <v-btn to="/attendees">Attendee</v-btn>
 
-        <!-- Attendance Dropdown -->
         <v-menu>
           <template v-slot:activator="{ props }">
             <v-btn v-bind="props" append-icon="mdi-chevron-down">

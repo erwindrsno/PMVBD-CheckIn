@@ -24,7 +24,7 @@ const itemToDelete = ref(null);
 const { statusDialog, itemToChange, statusMessage, statusMap, openStatusDialog } = useEventStatus();
 
 const headers = [
-  { title: 'No.', key: 'idx' }, // Uses index slot
+  { title: '#', key: 'idx' }, // Uses index slot
   { title: 'Name', key: 'name' },
   { title: 'Status', key: 'status' },
   { title: 'Created at', key: 'created_at' },
@@ -37,12 +37,13 @@ const fetchEvents = async () => {
   loading.value = true;
   try {
     const result = await apiFetchEvents();
-    console.log(result)
-    events.value = result.data?.events || result || [];
+    // Use optional chaining and nullish coalescing for safety
+    events.value = result?.data?.events ?? (Array.isArray(result) ? result : []);
   } catch (error) {
     console.error('Error fetching events:', error);
+    events.value = []; // Ensure it's an array so the table doesn't break
   } finally {
-    loading.value = false;
+    loading.value = false; // This MUST always run
   }
 };
 
