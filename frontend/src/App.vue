@@ -13,9 +13,22 @@ const currentView = ref('attendee');
     <v-app-bar rounded>
       <v-app-bar-title>PMVBD, Check In!</v-app-bar-title>
       <template v-slot:append>
-        <!-- Use 'to' instead of @click -->
         <v-btn to="/attendees">Attendee</v-btn>
-        <v-btn to="/attendance">Attendance</v-btn>
+
+        <!-- Attendance Dropdown -->
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" append-icon="mdi-chevron-down">
+              Attendance
+            </v-btn>
+          </template>
+
+          <v-list>
+            <v-list-item to="/attendances/capture" title="Capture Scan" />
+            <v-list-item to="/attendances/list" title="Attendance List" />
+          </v-list>
+        </v-menu>
+
         <v-btn to="/events">Event</v-btn>
         <v-btn to="/schools">School</v-btn>
       </template>
@@ -23,7 +36,6 @@ const currentView = ref('attendee');
 
     <v-main>
       <v-container fluid>
-        <!-- The component automatically swaps here based on the URL -->
         <router-view />
       </v-container>
     </v-main>

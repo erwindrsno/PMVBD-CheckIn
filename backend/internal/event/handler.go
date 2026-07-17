@@ -37,7 +37,7 @@ func (h *Handler) Create(c *gin.Context) {
 }
 
 func (h *Handler) Read(c *gin.Context) {
-	statusQuery := c.Query("status") // captures '?status=open'
+	statusQuery := c.Query("status")
 
 	filter := EventFilter{}
 	if statusQuery != "" {

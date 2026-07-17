@@ -103,6 +103,7 @@ func (a *App) setRoutes() {
 
 		attendances := api.Group("/attendances")
 		{
+			attendances.GET(":event_id", attendanceHandler.ReadByEventId)
 			attendances.POST("", attendanceHandler.Capture)
 		}
 

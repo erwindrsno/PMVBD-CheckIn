@@ -22,7 +22,6 @@ func NewHandler(s *Service) *Handler {
 }
 
 func (h *Handler) Capture(c *gin.Context) {
-	slog.Info("attendance capture handler", "info", "hello")
 	var req AttendanceCapturePayload
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -43,4 +42,16 @@ func (h *Handler) Capture(c *gin.Context) {
 		return
 	}
 	responses.Success(c, http.StatusCreated, gin.H{"avi": *avi})
+}
+
+func (h *Handler) ReadByEventId(c *gin.Context) {
+	eventIdParam := c.Param("event_id") // captures '?status=open'
+	slog.Info("event id param is", "info", eventIdParam)
+
+	atvis, err := h.s.ReadByEventId(eventIdParam)
+	if err != nil {
+		responses.Fail(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	responses.Success(c, http.StatusCreated, gin.H{"atvis": atvis})
 }

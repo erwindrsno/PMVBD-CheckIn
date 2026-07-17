@@ -58,3 +58,17 @@ func (s *Service) Capture(acp AttendanceCapturePayload) (*attendee.AttendeeViewI
 	}
 	return attendee, nil
 }
+
+func (s *Service) ReadByEventId(req string) ([]AttendanceViewItem, error) {
+	eventId, err := uuid.Parse(req)
+	if err != nil {
+		slog.Error("error during parse string to uuid in attendance read", "error", err.Error())
+		return nil, err
+	}
+	atvis, err := s.st.GetListViewByEventId(eventId)
+	if err != nil {
+		slog.Error("error in get attendance list view", "error", err)
+		return nil, err
+	}
+	return atvis, nil
+}
