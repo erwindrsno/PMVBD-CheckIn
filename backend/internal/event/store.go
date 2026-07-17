@@ -11,8 +11,8 @@ import (
 
 type Store interface {
 	Insert(payload Event) error
-	GetListView(filter EventFilter) ([]Event, error)
-	GetPaginatedListView(limit, offset int) ([]Event, error)
+	GetListView(filter EventFilter) ([]EventViewItem, error)
+	GetPaginatedListView(limit, offset int) ([]EventViewItem, error)
 	UpdateStatus(id uuid.UUID) error
 	Delete(id uuid.UUID) error
 }
@@ -32,14 +32,14 @@ func (s *SQLiteStore) Insert(payload Event) error {
 		INSERT INTO events (id, name, status, created_at, started_at)
 		VALUES(?, ?, ?, ?, ?)
 	`
-	_, err := s.db.Exec(query, payload.Id.String(), payload.Name, payload.Status, payload.CreatedAt, nil)
+	_, err := s.db.Exec(query, payload.Id.String(), payload.Name, payload.Status, time.Now().Format("2006-01-02 15:04:05"), nil)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *SQLiteStore) GetPaginatedListView(limit, offset int) ([]Event, error) {
+func (s *SQLiteStore) GetPaginatedListView(limit, offset int) ([]EventViewItem, error) {
 	query := `
 		SELECT e.id, e.name, e.created_at, e.started_at, e.status
 		FROM events e
@@ -47,7 +47,7 @@ func (s *SQLiteStore) GetPaginatedListView(limit, offset int) ([]Event, error) {
 		LIMIT ? OFFSET ?
 	`
 
-	var es []Event
+	var es []EventViewItem
 	rows, err := s.db.Query(query, limit, offset)
 	if err != nil {
 		slog.Error("Getting list view in repo", "error", err)
@@ -69,7 +69,7 @@ func (s *SQLiteStore) GetPaginatedListView(limit, offset int) ([]Event, error) {
 	return es, nil
 }
 
-func (s *SQLiteStore) GetListView(filter EventFilter) ([]Event, error) {
+func (s *SQLiteStore) GetListView(filter EventFilter) ([]EventViewItem, error) {
 	query := `
         SELECT e.id, e.name, e.created_at, e.started_at, e.status
         FROM events e
@@ -93,7 +93,7 @@ func (s *SQLiteStore) GetListView(filter EventFilter) ([]Event, error) {
 	}
 	defer rows.Close()
 
-	var es []Event
+	var es []EventViewItem
 	for rows.Next() {
 		var id uuid.UUID
 		var name, createdAtStr, status string

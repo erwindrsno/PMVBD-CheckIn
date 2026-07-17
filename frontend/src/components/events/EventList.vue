@@ -37,6 +37,7 @@ const fetchEvents = async () => {
   loading.value = true;
   try {
     const result = await apiFetchEvents();
+    console.log(result)
     events.value = result.data?.events || result || [];
   } catch (error) {
     console.error('Error fetching events:', error);

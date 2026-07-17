@@ -1,9 +1,7 @@
 package event
 
 import (
-	"fmt"
 	"log/slog"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -30,13 +28,15 @@ func (s *Service) Create(name string) error {
 		Name:   name,
 		Status: New,
 	}
-	loc, err := time.LoadLocation("Asia/Jakarta")
-	if err != nil {
-		fmt.Println(err)
-		loc = time.UTC
-	}
-	now := time.Now().In(loc)
-	payload.CreatedAt = now.Truncate(time.Second)
+	// loc, err := time.LoadLocation("Asia/Jakarta")
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	loc = time.UTC
+	// }
+	// now := time.Now().In(loc)
+	// payload.CreatedAt = now.Truncate(time.Second)
+	//
+	// payload.CreatedAt = time.Now().Format("2006-01-02 15:04:05")
 	if err := s.st.Insert(payload); err != nil {
 		slog.Error("Database failure in Service.Read", "error", err)
 		return err
@@ -44,7 +44,7 @@ func (s *Service) Create(name string) error {
 	return nil
 }
 
-func (s *Service) Read(filter EventFilter) ([]Event, error) {
+func (s *Service) Read(filter EventFilter) ([]EventViewItem, error) {
 	res, err := s.st.GetListView(filter)
 	if err != nil {
 		slog.Error("Database failure in Service.Read", "error", err)
@@ -53,16 +53,6 @@ func (s *Service) Read(filter EventFilter) ([]Event, error) {
 		return res, nil
 	}
 }
-
-// func (s *Service) ReadByOpen() ([]Event, error) {
-// 	res, err := s.st.GetListViewByOpen()
-// 	if err != nil {
-// 		slog.Error("Database failure in Service.Read", "error", err)
-// 		return nil, ErrInternal
-// 	} else {
-// 		return res, nil
-// 	}
-// }
 
 func (s *Service) UpdateStatus(id uuid.UUID) error {
 	if err := s.st.UpdateStatus(id); err != nil {
