@@ -9,7 +9,7 @@ const newSchool = ref({ name: '', location: '', contact: '' });
 
 const headers = [
   { title: '#', key: 'idx' },
-  { title: 'School Name', key: 'name' },
+  { title: 'Nama Sekolah', key: 'name' },
 ];
 
 // --- API Logic ---
@@ -53,8 +53,8 @@ onMounted(() => {
 
 <template>
   <div class="d-flex justify-space-between align-center mb-4">
-    <h1>School List</h1>
-    <v-btn color="primary" @click="dialog = true">Add New School</v-btn>
+    <h1>Daftar sekolah</h1>
+    <v-btn color="primary" @click="dialog = true">Tambah sekolah baru</v-btn>
   </div>
 
   <v-data-table
@@ -76,14 +76,14 @@ onMounted(() => {
   <!-- Add School Dialog -->
   <v-dialog v-model="dialog" max-width="500px">
     <v-card>
-      <v-card-title>Add New School</v-card-title>
+      <v-card-title>Tambah sekolah baru</v-card-title>
       <v-card-text>
         <v-text-field v-model="newSchool.name" label="School Name"></v-text-field>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="grey" @click="dialog = false">Cancel</v-btn>
-        <v-btn color="primary" @click="saveSchool">Save</v-btn>
+        <v-btn color="grey" @click="dialog = false">Batal</v-btn>
+        <v-btn color="primary" @click="saveSchool">Simpan</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

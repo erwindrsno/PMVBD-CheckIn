@@ -20,27 +20,27 @@ const currentView = ref('attendee');
             class="mr-3 flex-grow-0"
             cover
           />
-          <span>PMVBD, Check In!</span>
+          <span>PMVBD, Hadir!</span>
         </div>
       </v-app-bar-title>
       <template v-slot:append>
-        <v-btn to="/attendees">Attendee</v-btn>
+        <v-btn to="/attendees">Peserta</v-btn>
 
         <v-menu>
           <template v-slot:activator="{ props }">
             <v-btn v-bind="props" append-icon="mdi-chevron-down">
-              Attendance
+              Kehadiran
             </v-btn>
           </template>
 
           <v-list>
-            <v-list-item to="/attendances/capture" title="Capture Scan" />
-            <v-list-item to="/attendances/list" title="Attendance List" />
+            <v-list-item to="/attendances/capture" title="Rekam Kehadiran" />
+            <v-list-item to="/attendances/list" title="Daftar Kehadiran" />
           </v-list>
         </v-menu>
 
-        <v-btn to="/events">Event</v-btn>
-        <v-btn to="/schools">School</v-btn>
+        <v-btn to="/events">Agenda</v-btn>
+        <v-btn to="/schools">Sekolah</v-btn>
       </template>
     </v-app-bar>
 

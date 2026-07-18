@@ -1,6 +1,7 @@
 package attendee
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/responses"
@@ -24,6 +25,7 @@ func (h *Handler) Create(c *gin.Context) {
 		responses.Fail(c, http.StatusBadRequest, err.Error())
 		return
 	}
+	slog.Info("create attendee", "info", req)
 
 	if err := h.s.Create(req); err != nil {
 		responses.Fail(c, http.StatusBadRequest, err.Error())

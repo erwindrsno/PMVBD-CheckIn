@@ -7,10 +7,10 @@ const attendanceList = ref([]);
 
 const headers = [
   { title: '#', key: 'idx' },
-  { title: 'Attendee Name', key: 'attendee_name' },
-  { title: 'School', key: 'school_name' },
-  { title: 'Grade', key: 'full_grade' },
-  { title: 'Scanned At', key: 'scanned_at' },
+  { title: 'Nama Peserta', key: 'attendee_name' },
+  { title: 'Sekolah', key: 'school_name' },
+  { title: 'Kelas', key: 'full_grade' },
+  { title: 'Direkam pada', key: 'scanned_at' },
 ];
 
 // 1. Fetch available events for the dropdown
@@ -40,7 +40,7 @@ onMounted(() => {
 
 <template>
   <v-container>
-    <h2 class="text-h5 mb-4">Attendance Records</h2>
+    <h2 class="text-h5 mb-4">Riwayat Kehadiran</h2>
 
     <!-- Event Selector -->
     <v-select
@@ -48,7 +48,7 @@ onMounted(() => {
       :items="events"
       item-title="name"
       item-value="id"
-      label="Filter by Event"
+      label="Filter berdasarkan Agenda"
       variant="outlined"
       class="mb-4"
       clearable

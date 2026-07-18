@@ -25,11 +25,11 @@ const { statusDialog, itemToChange, statusMessage, statusMap, openStatusDialog }
 
 const headers = [
   { title: '#', key: 'idx' }, // Uses index slot
-  { title: 'Name', key: 'name' },
+  { title: 'Nama', key: 'name' },
   { title: 'Status', key: 'status' },
-  { title: 'Created at', key: 'created_at' },
-  { title: 'Started at', key: 'started_at' },
-  { title: 'Action', key: 'action', align: 'center' }
+  { title: 'Dibuat pada', key: 'created_at' },
+  { title: 'Dimulai pada', key: 'started_at' },
+  { title: 'Aksi', key: 'action', align: 'center' }
 ];
 
 // --- API Logic ---
@@ -110,7 +110,7 @@ onMounted(() => {
 <template>
   <div class="d-flex justify-space-between align-center mb-4">
     <h1>Event List</h1>
-    <v-btn color="primary" @click="dialog = true">Add New Event</v-btn>
+    <v-btn color="primary" @click="dialog = true">Tambah Agenda Baru</v-btn>
   </div>
 
   <v-data-table

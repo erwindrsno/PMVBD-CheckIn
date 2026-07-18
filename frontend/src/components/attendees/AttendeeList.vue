@@ -31,15 +31,15 @@
     // 3. Filter subgrades where subgrade.level_id matches the grade's level_id
     return subgrades.value.filter(s => s.level_id === selectedGrade.level_id);
   });
-  const genderOptions = ['Male', 'Female'];
+  const genderOptions = ['Laki-laki', 'Perempuan'];
 
   const headers = [
     { title: '#', key: 'idx', width: '50px' },
-    { title: 'Name', key: 'name', width: '350px' },
-    { title: 'School', key: 'school'},
-    { title: 'Grade', key: 'grade'},
+    { title: 'Nama', key: 'name', width: '350px' },
+    { title: 'Sekolah', key: 'school'},
+    { title: 'Kelas', key: 'grade'},
     { title: 'Telp', key: 'telp' },
-    { title: 'Action', key: 'action', width:'200px' ,align: 'center' }
+    { title: 'Aksi', key: 'action', width:'200px' ,align: 'center' }
   ];
 
   const viewDetails = (item) => {
@@ -81,6 +81,7 @@
       ]);
 
       const attendeesData = await attendeesRes.json();
+      console.log(attendeesData)
       const schoolsData = await schoolsRes.json();
       const gradesData = await gradesRes.json();
       const subgradesData = await subgradesRes.json();
@@ -130,8 +131,8 @@
 
 <template>
   <div class="d-flex justify-space-between align-center mb-4">
-    <h1>Attendee List</h1>
-    <v-btn color="primary" @click="dialog = true">Add New Attendee</v-btn>
+    <h1>Daftar peserta</h1>
+    <v-btn color="primary" @click="dialog = true">Tambah peserta baru</v-btn>
   </div>
 
   <v-data-table
@@ -151,7 +152,7 @@
 
     <!-- Action Column -->
     <template v-slot:header.action>
-      <div class="text-center">Action</div>
+      <div class="text-center">Aksi</div>
     </template>
     <template v-slot:item.action="{ item }">
       <!-- Call viewDetails(item) instead of editEvent -->
@@ -175,18 +176,18 @@
   <!-- Add Attendee Dialog -->
   <v-dialog v-model="dialog" max-width="700px">
     <v-card>
-      <v-card-title class="bg-primary text-white">Add New Attendee</v-card-title>
+      <v-card-title class="bg-primary text-white">Tambah peserta baru</v-card-title>
       <v-card-text>
         <v-container>
           <v-row>
             <v-col cols="12">
-              <v-text-field v-model="newAttendee.name" label="Name" required></v-text-field>
+              <v-text-field v-model="newAttendee.name" label="Nama" required></v-text-field>
             </v-col>
 
             <v-col cols="12">
               <v-radio-group v-model="newAttendee.gender" inline label="Gender">
-                <v-radio label="Male" value="male"></v-radio>
-                <v-radio label="Female" value="female"></v-radio>
+                <v-radio label="Laki-laki" value="male"></v-radio>
+                <v-radio label="Perempuan" value="female"></v-radio>
               </v-radio-group>
             </v-col>
 
@@ -194,7 +195,7 @@
               <v-select
                 v-model="newAttendee.school_id"
                 :items="schools"
-                label="School"
+                label="Sekolah"
                 item-title="name"
                 item-value="id"
               ></v-select>
@@ -205,7 +206,7 @@
               <v-select
                 v-model="newAttendee.grade_id"
                 :items="grades"
-                label="Grade"
+                label="Kelas"
                 item-title="label"
                 item-value="id"
                 @update:model-value="newAttendee.subgrade_id = null"
@@ -215,7 +216,7 @@
               <v-select
                 v-model="newAttendee.subgrade_id"
                 :items="filteredSubgrades"
-                label="Subgrade"
+                label="Sub kelas"
                 item-title="name"
                 item-value="id"
                 :disabled="!newAttendee.grade_id"
@@ -224,18 +225,18 @@
 
             <!-- Contact numbers Side by Side -->
             <v-col cols="6">
-              <v-text-field v-model="newAttendee.telp" label="Contact Number"></v-text-field>
+              <v-text-field v-model="newAttendee.telp" label="Nomor telepon"></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field v-model="newAttendee.guardian_telp" label="Guardian Contact"></v-text-field>
+              <v-text-field v-model="newAttendee.guardian_telp" label="No. Telp Orang Tua/Wali"></v-text-field>
             </v-col>
           </v-row>
         </v-container>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="grey" @click="dialog = false">Cancel</v-btn>
-        <v-btn color="primary" @click="saveAttendee">Save</v-btn>
+        <v-btn color="grey" @click="dialog = false">Batal</v-btn>
+        <v-btn color="primary" @click="saveAttendee">Simpan</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

@@ -40,11 +40,14 @@ const handleScan = async () => {
     });
 
     if (response.status === 409) {
-      alert("⚠️ Alert: This attendee has already checked in!");
+      const result = await response.json();
+
+      console.log(result)
+      alert(`⚠️ Alert: Kehadiran peserta ini telah direkam!`);
       inputID.value = ''; // Clear input
       return;
     } else if(response.status === 404){
-      alert("⚠️ Alert: This attendee is not exist!");
+      alert("⚠️ Alert: Peserta dengan ID ini tidak terdaftar!");
       inputID.value = ''; // Clear input
       return;
     }
@@ -79,7 +82,7 @@ onMounted(() => {
 
 <template>
   <v-container max-width="600">
-    <h1 class="text-h4 mb-6">Capture Attendance</h1>
+    <h1 class="text-h4 mb-6">Rekam Kehadiran</h1>
 
     <!-- Dropdown for Event Selection -->
     <v-select
@@ -87,7 +90,7 @@ onMounted(() => {
       :items="events"
       item-title="name"
       item-value="id"
-      label="Select Open Event"
+      label='Pilih agenda yang sedang terbuka'
       variant="outlined"
       class="mb-4"
       prepend-inner-icon="mdi-calendar-check"
@@ -99,17 +102,18 @@ onMounted(() => {
       <v-card-text class="pa-3">
         <div v-if="!currentAttendee" class="text-center mt-10 text-grey">
           <v-icon size="64" color="grey-lighten-1" class="mb-4">mdi-qrcode-scan</v-icon>
-          <p class="text-h6">Waiting for input...</p>
-          <p>Please select an event and scan a QR code.</p>
+          <p class="text-h6">Sedang menunggu input...</p>
+          <p>Mohon untuk memilih sebuah agenda dan memindai kode QR.</p>
+
         </div>
 
         <div v-else>
-          <h2 class="text-h5 mb-4 text-primary text-center">Attendee Found!</h2>
+          <h2 class="text-h5 mb-4 text-primary text-center">Peserta ditemukan!</h2>
           <v-list density="comfortable">
-            <v-list-item title="Name" :subtitle="currentAttendee.name"></v-list-item>
+            <v-list-item title="Nama" :subtitle="currentAttendee.name"></v-list-item>
             <v-list-item title="ID" :subtitle="currentAttendee.public_id"></v-list-item>
-            <v-list-item title="School" :subtitle="currentAttendee.school"></v-list-item>
-            <v-list-item title="Grade" :subtitle="`${currentAttendee.grade} - ${currentAttendee.subgrade}`"></v-list-item>
+            <v-list-item title="Sekolah" :subtitle="currentAttendee.school"></v-list-item>
+            <v-list-item title="Kelas" :subtitle="`${currentAttendee.grade} - ${currentAttendee.subgrade}`"></v-list-item>
           </v-list>
         </div>
       </v-card-text>
@@ -118,7 +122,7 @@ onMounted(() => {
     <!-- Input Section -->
     <v-text-field
       v-model="inputID"
-      label="Scan or Enter Attendee ID"
+      label="Scan atau masukkan ID Peserta"
       variant="outlined"
       autofocus
       prepend-inner-icon="mdi-barcode-scan"
