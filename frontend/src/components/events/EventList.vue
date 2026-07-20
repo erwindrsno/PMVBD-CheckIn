@@ -108,8 +108,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="d-flex justify-space-between align-center mb-4">
-    <h1>Event List</h1>
+  <div class="d-flex justify-space-between align-center">
+    <h1>Daftar Agenda</h1>
     <v-btn color="primary" @click="dialog = true">Tambah Agenda Baru</v-btn>
   </div>
 
