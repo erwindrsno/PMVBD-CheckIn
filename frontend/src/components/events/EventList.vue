@@ -113,10 +113,22 @@ onMounted(() => {
     <v-btn color="primary" @click="dialog = true">Tambah Agenda Baru</v-btn>
   </div>
 
+  <v-alert
+      density="compact"
+      type="warning"
+      variant="outlined"
+      class="mb-4"
+    >
+    Format penamaan agenda: <strong>NAMA AGENDA | LOKASI | DD-MM-YYYY</strong>
+    <br>
+    Contoh: <em>Kebhaktian Umum | Vihara Buddha Diepa | 01-01-2026</em>
+  </v-alert>
+
   <v-data-table
     :headers="headers"
     :items="events"
     :loading="loading"
+    :items-per-page="5"
     class="elevation-1"
   >
     <template v-slot:header.status>
