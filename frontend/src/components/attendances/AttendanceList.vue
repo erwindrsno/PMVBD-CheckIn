@@ -115,4 +115,5 @@ onMounted(() => {
     :attendee-name="itemToDelete?.attendee_name || ''"
     @confirm="confirmDelete"
   />
+
 </template>

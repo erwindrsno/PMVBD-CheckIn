@@ -6,6 +6,16 @@ const currentAttendee = ref(null);
 const selectedEvent = ref(null);
 const events = ref([]); // Start as an empty array
 
+const snackbar = ref({
+  show: false,
+  text: '',
+  color: ''
+});
+
+const showSnackbar = (text, color = 'success') => {
+  snackbar.value = { show: true, text, color };
+};
+
 // Function to fetch events from your API
 const fetchOpenEvents = async () => {
   try {
@@ -42,12 +52,11 @@ const handleScan = async () => {
     if (response.status === 409) {
       const result = await response.json();
 
-      console.log(result)
-      alert(`⚠️ Alert: Kehadiran peserta ini telah direkam!`);
+      showSnackbar('Kehadiran peserta bersangkutan telah direkam sebelumnya.', 'warning');
       inputID.value = ''; // Clear input
       return;
     } else if(response.status === 404){
-      alert("⚠️ Alert: Peserta dengan ID ini tidak terdaftar!");
+      showSnackbar(`Peserta dengan ID '${inputID.value}' tidak ditemukan.`, 'error');
       inputID.value = ''; // Clear input
       return;
     }
@@ -130,4 +139,19 @@ onMounted(() => {
       :disabled="!selectedEvent"
     ></v-text-field>
   </v-container>
+
+  <v-snackbar
+    v-model="snackbar.show"
+    :color="snackbar.color"
+    location="top"
+    timeout="5000"
+  >
+      {{ snackbar.text }}
+
+    <template v-slot:actions>
+      <v-btn color="white" variant="text" @click="snackbar.show = false">
+        Close
+      </v-btn>
+    </template>
+  </v-snackbar>
 </template>
