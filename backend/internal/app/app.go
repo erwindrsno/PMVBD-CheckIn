@@ -23,14 +23,18 @@ type App struct {
 }
 
 func New() *App {
-	dbPath := "pmvbd-checkin.db"
+	dbPath := "pmvbd-checkin-dev.db"
 	db, err := database.InitDB(dbPath)
 	if err != nil {
 		slog.Error(err.Error())
 	}
 
 	router := gin.Default()
-	router.Use(cors.Default())
+
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:5173", "http://127.0.0.1:5173"}
+	router.Use(cors.New(config))
+	// router.Use(cors.Default())
 
 	a := &App{
 		DB:     db,
@@ -105,6 +109,7 @@ func (a *App) setRoutes() {
 		{
 			attendances.GET(":event_id", attendanceHandler.ReadByEventId)
 			attendances.POST("", attendanceHandler.Capture)
+			attendances.DELETE(":id", attendanceHandler.DeleteById)
 		}
 
 		grades := api.Group("/grades")

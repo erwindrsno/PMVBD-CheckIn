@@ -112,36 +112,6 @@ func (s *SQLiteStore) GetListView(filter EventFilter) ([]EventViewItem, error) {
 	return es, nil
 }
 
-// func (s *SQLiteStore) GetListViewByOpen() ([]Event, error) {
-// 	query := `
-// 		SELECT e.id, e.name, e.created_at, e.started_at, e.status
-// 		FROM events e
-// 		WHERE e.status == 1
-// 		ORDER BY e.created_at -- Always include ORDER BY when using LIMIT
-// 	`
-//
-// 	var es []Event
-// 	rows, err := s.db.Query(query)
-// 	if err != nil {
-// 		slog.Error("Getting list view in repo", "error", err)
-// 		return nil, err
-// 	}
-// 	defer rows.Close()
-// 	for rows.Next() {
-// 		var id uuid.UUID
-// 		var name, createdAtStr, status string
-// 		var startedAtNull sql.NullString
-//
-// 		if err := rows.Scan(&id, &name, &createdAtStr, &startedAtNull, &status); err != nil {
-// 			return nil, err
-// 		}
-//
-// 		// Store now only handles data retrieval, not transformation
-// 		es = append(es, mapRowToEvent(id, name, createdAtStr, startedAtNull, status))
-// 	}
-// 	return es, nil
-// }
-
 func (s *SQLiteStore) UpdateStatus(id uuid.UUID) error {
 	// 1. Get current status
 	var currentStatus Status
@@ -178,21 +148,17 @@ func (s *SQLiteStore) Delete(id uuid.UUID) error {
 	// 1. Prepare the SQL statement
 	query := `DELETE FROM events WHERE id = ?`
 
-	// 2. Execute the query
-	// We convert the UUID to a string to match the SQLite storage format
 	result, err := s.db.Exec(query, id.String())
 	if err != nil {
 		return err
 	}
 
-	// 3. Optional: Check if a row was actually deleted
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return err
 	}
 
 	if rowsAffected == 0 {
-		// This can happen if the ID doesn't exist
 		return fmt.Errorf("no event found with id %s", id.String())
 	}
 

@@ -10,6 +10,7 @@ import (
 type Store interface {
 	Insert(payload Attendance) error
 	GetListViewByEventId(eventId uuid.UUID) ([]AttendanceViewItem, error)
+	Delete(id uuid.UUID) error
 }
 
 type SQLiteStore struct {
@@ -80,5 +81,32 @@ func (s *SQLiteStore) GetListViewByEventId(eventId uuid.UUID) ([]AttendanceViewI
 		atvis = append(atvis, atvi)
 	}
 
+	if err = rows.Err(); err != nil {
+		return nil, err // This catches errors that happened during the loop
+	}
+
 	return atvis, nil
+}
+
+func (s *SQLiteStore) Delete(id uuid.UUID) error {
+	query := `
+		DELETE FROM attendances
+		WHERE id = ?
+	`
+
+	result, err := s.db.Exec(query, id.String())
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return ErrResourceNotFound
+	}
+
+	return nil
 }

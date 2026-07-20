@@ -1,6 +1,7 @@
 package attendance
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -71,4 +72,16 @@ func (s *Service) ReadByEventId(req string) ([]AttendanceViewItem, error) {
 		return nil, err
 	}
 	return atvis, nil
+}
+
+func (s *Service) Delete(id uuid.UUID) error {
+	if err := s.st.Delete(id); err != nil {
+		if errors.Is(err, ErrResourceNotFound) {
+			return ErrResourceNotFound
+		} else {
+			slog.Error("Database failure in Service.Delete", "error", err)
+			return ErrInternal
+		}
+	}
+	return nil
 }

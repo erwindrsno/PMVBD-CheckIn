@@ -8,6 +8,7 @@ import (
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/attendee"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/responses"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type Handler struct {
@@ -54,4 +55,20 @@ func (h *Handler) ReadByEventId(c *gin.Context) {
 		return
 	}
 	responses.Success(c, http.StatusCreated, gin.H{"atvis": atvis})
+}
+
+func (h *Handler) DeleteById(c *gin.Context) {
+	idParam := c.Param("id")
+	id, err := uuid.Parse(idParam)
+	if err != nil {
+		if errors.Is(err, ErrResourceNotFound) {
+			responses.Fail(c, http.StatusNotFound, err.Error())
+		} else {
+			responses.Fail(c, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+	if err := h.s.Delete(id); err != nil {
+		responses.Fail(c, http.StatusInternalServerError, err.Error())
+	}
 }

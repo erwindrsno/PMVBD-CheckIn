@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	// "fyne.io/fyne/v2"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -16,10 +15,11 @@ func InitDB(path string) (*sql.DB, error) {
 	// 2. Create the tables (The "Schema")
 	query := `
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-				username TEXT unique,
-				password TEXT
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+			username TEXT unique,
+			password TEXT
     );
+
 
 		CREATE TABLE IF NOT EXISTS events(
 			id TEXT PRIMARY KEY,
@@ -29,11 +29,13 @@ func InitDB(path string) (*sql.DB, error) {
 			started_at TEXT
 		);
 
-    CREATE TABLE IF NOT EXISTS schools (
+
+		CREATE TABLE IF NOT EXISTS schools (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
 			name TEXT,
 			UNIQUE(name)
     );
+
 
 		CREATE TABLE IF NOT EXISTS attendees(
 			id TEXT PRIMARY KEY,
@@ -52,7 +54,8 @@ func InitDB(path string) (*sql.DB, error) {
       FOREIGN KEY(subgrade_id) REFERENCES subgrades(id)
 		);
 
-    CREATE TABLE IF NOT EXISTS attendances (
+
+		CREATE TABLE IF NOT EXISTS attendances (
       id TEXT PRIMARY KEY,
 			attendee_id TEXT,
 			event_id TEXT,
@@ -67,10 +70,11 @@ func InitDB(path string) (*sql.DB, error) {
 		    name TEXT NOT NULL
 		);
 		
+
 		CREATE TABLE IF NOT EXISTS grades (
 		    id INTEGER PRIMARY KEY AUTOINCREMENT,
 		    numerical_grade INTEGER NOT NULL,
-		    level_id INTEGER NOT NULL,
+		    level_id INTEGER NOT NULL, label TEXT,
 		    FOREIGN KEY (level_id) REFERENCES levels(id)
 		);
 		

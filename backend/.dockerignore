@@ -1,0 +1,9 @@
+# .dockerignore
+.git
+.env
+bin/
+dist/
+tmp/
+*.exe
+.DS_Store
+*.db
