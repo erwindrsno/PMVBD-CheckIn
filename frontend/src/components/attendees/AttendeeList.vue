@@ -86,6 +86,8 @@
       const gradesData = await gradesRes.json();
       const subgradesData = await subgradesRes.json();
 
+      console.log(schoolsData)
+
       attendees.value = attendeesData.data.attendees || [];
       schools.value = schoolsData.data.schools || []; // Assuming your API returns { data: { schools: [...] } }
       grades.value = gradesData.data.grades || [];

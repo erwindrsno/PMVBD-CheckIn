@@ -69,7 +69,6 @@ func InitDB(path string) (*sql.DB, error) {
 		    id INTEGER PRIMARY KEY AUTOINCREMENT,
 		    name TEXT NOT NULL
 		);
-		
 
 		CREATE TABLE IF NOT EXISTS grades (
 		    id INTEGER PRIMARY KEY AUTOINCREMENT,

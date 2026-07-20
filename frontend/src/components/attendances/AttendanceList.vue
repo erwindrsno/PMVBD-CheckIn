@@ -1,9 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue';
+import DeleteConfirmDialog from './DeleteConfirmDialog.vue'
 
 const selectedEvent = ref(null);
 const events = ref([]); // You need to populate this from your /api/v1/events endpoint
 const attendanceList = ref([]);
+const itemToDelete = ref(null);
+const deleteDialog = ref(false);
 
 const headers = [
   { title: '#', key: 'idx' },
@@ -11,6 +14,7 @@ const headers = [
   { title: 'Sekolah', key: 'school_name' },
   { title: 'Kelas', key: 'full_grade' },
   { title: 'Direkam pada', key: 'scanned_at' },
+  { title: 'Aksi', key: 'action',align: 'center' }
 ];
 
 // 1. Fetch available events for the dropdown
@@ -31,6 +35,29 @@ const fetchAttendance = async () => {
   const res = await fetch(`http://localhost:8080/api/v1/attendances/${selectedEvent.value}`);
   const attendanceData = await res.json();
   attendanceList.value = attendanceData.data.atvis || [];
+};
+
+
+const openDeleteDialog = (item) => {
+  itemToDelete.value = item;
+  deleteDialog.value = true;
+};
+
+const confirmDelete = async () => {
+  if (!itemToDelete.value) return;
+  try {
+    const response = await fetch(`http://localhost:8080/api/v1/attendances/${itemToDelete.value.attendance_id}`, {
+      method: 'DELETE',
+    });
+    if (response.ok) {
+      await fetchAttendance();
+    }
+  } catch (error) {
+    console.error('Error deleting attendance:', error);
+  } finally {
+    deleteDialog.value = false;
+    itemToDelete.value = null;
+  }
 };
 
 onMounted(() => {
@@ -70,6 +97,22 @@ onMounted(() => {
       <template v-slot:item.scanned_at="{ item }">
         {{ new Date(item.scanned_at).toLocaleString() }}
       </template>
+
+      <!-- Action Column -->
+      <template v-slot:header.action>
+        <div class="text-center">Aksi</div>
+      </template>
+      <template v-slot:item.action="{ item }">
+        <v-btn icon variant="text" size="small" color="error" @click="openDeleteDialog(item)">
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
+      </template>
     </v-data-table>
   </v-container>
+
+  <DeleteConfirmDialog
+    v-model="deleteDialog"
+    :attendee-name="itemToDelete?.attendee_name || ''"
+    @confirm="confirmDelete"
+  />
 </template>

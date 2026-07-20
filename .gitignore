@@ -39,7 +39,7 @@ frontend/__screenshots__/
 frontend/*.timestamp-*-*.mjs
 
 
-backend/pmvbd-checkin.db
+backend/*.db
 backend/.env
 backend/tmp/main
 
