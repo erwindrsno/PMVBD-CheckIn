@@ -50,5 +50,10 @@ func (h *Handler) Login(c *gin.Context) {
 		}
 		return
 	}
-	responses.Success(c, http.StatusOK, gin.H{"success": true})
+	token, err := auth.GenerateToken()
+	if err != nil {
+		responses.Fail(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	responses.Success(c, http.StatusOK, gin.H{"token": token})
 }

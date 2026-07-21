@@ -9,6 +9,7 @@ import (
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/database"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/event"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/grade"
+	"github.com/erwindrsno/PMVBD-CheckIn/internal/middleware"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/school"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/subgrade"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/user"
@@ -88,15 +89,18 @@ func (a *App) setRoutes() {
 	userService := user.NewService(userStore)
 	userHandler := user.NewHandler(userService)
 
-	api := a.Router.Group("/api/v1")
+	a.Router.POST("/api/v1/users/login", userHandler.Login)
+
+	protected := a.Router.Group("/api/v1")
+	protected.Use(middleware.AuthMiddleware())
 	{
-		schools := api.Group("/schools")
+		schools := protected.Group("/schools")
 		{
 			schools.GET("", schoolHandler.Read)
 			schools.POST("", schoolHandler.Create)
 		}
 
-		events := api.Group("/events")
+		events := protected.Group("/events")
 		{
 			events.GET("", eventHandler.Read)
 			events.POST("", eventHandler.Create)
@@ -104,36 +108,35 @@ func (a *App) setRoutes() {
 			events.DELETE(":id", eventHandler.Delete)
 		}
 
-		attendees := api.Group("/attendees")
+		attendees := protected.Group("/attendees")
 		{
 			attendees.GET("", attendeeHandler.Read)
 			attendees.POST("", attendeeHandler.Create)
 			attendees.DELETE(":public_id", attendeeHandler.Delete)
 		}
 
-		attendances := api.Group("/attendances")
+		attendances := protected.Group("/attendances")
 		{
 			attendances.GET(":event_id", attendanceHandler.ReadByEventId)
 			attendances.POST("", attendanceHandler.Capture)
 			attendances.DELETE(":id", attendanceHandler.DeleteById)
 		}
 
-		grades := api.Group("/grades")
+		grades := protected.Group("/grades")
 		{
 			grades.GET("", gradeHandler.Read)
 			grades.POST("", gradeHandler.Create)
 		}
 
-		subgrades := api.Group("/subgrades")
+		subgrades := protected.Group("/subgrades")
 		{
 			subgrades.GET("", subgradeHandler.Read)
 			subgrades.POST("", subgradeHandler.Create)
 		}
 
-		users := api.Group("/users")
+		users := protected.Group("/users")
 		{
 			users.POST("", userHandler.Create)
-			users.POST("/login", userHandler.Login)
 		}
 	}
 }
