@@ -1,9 +1,14 @@
 package auth
 
-import "github.com/alexedwards/argon2id"
+import (
+	"fmt"
+	"log/slog"
+
+	"github.com/alexedwards/argon2id"
+)
 
 func HashPassword(password string) (string, error) {
-	hash, err := argon2id.CreateHash("pa$$word", argon2id.DefaultParams)
+	hash, err := argon2id.CreateHash(password, argon2id.DefaultParams)
 	if err != nil {
 		return "", err
 	}
@@ -11,6 +16,7 @@ func HashPassword(password string) (string, error) {
 }
 
 func VerifyPassword(password, storedPassword string) error {
+	slog.Info("verify password", "password and stored password", fmt.Sprintf("%s\n%s", password, storedPassword))
 	match, err := argon2id.ComparePasswordAndHash(password, storedPassword)
 	if err != nil {
 		return err

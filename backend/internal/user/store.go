@@ -2,6 +2,7 @@ package user
 
 import (
 	"database/sql"
+	"log/slog"
 )
 
 type User struct {
@@ -12,6 +13,7 @@ type User struct {
 
 type Store interface {
 	Insert(user *User) error
+	GetByUsername(username string) (*User, error)
 }
 
 type SQLiteStore struct {
@@ -34,4 +36,28 @@ func (s *SQLiteStore) Insert(user *User) error {
 		return err
 	}
 	return nil
+}
+
+func (s *SQLiteStore) GetByUsername(username string) (*User, error) {
+	query := `
+		SELECT username, password
+		FROM users u
+		WHERE u.username = ?
+	`
+
+	rows, err := s.db.Query(query, username)
+	if err != nil {
+		slog.Error("Getting user by username in repo", "error", err)
+		return nil, err
+	}
+	defer rows.Close()
+	var user User
+	if rows.Next() {
+		if err := rows.Scan(&user.Username, &user.Password); err != nil {
+			return nil, err
+		}
+		return &user, nil
+	} else {
+		return nil, err
+	}
 }

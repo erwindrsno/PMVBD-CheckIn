@@ -133,6 +133,7 @@ func (a *App) setRoutes() {
 		users := api.Group("/users")
 		{
 			users.POST("", userHandler.Create)
+			users.POST("/login", userHandler.Login)
 		}
 	}
 }

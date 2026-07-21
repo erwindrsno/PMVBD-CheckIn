@@ -31,3 +31,15 @@ func (s *Service) Create(user *User) error {
 	}
 	return nil
 }
+
+func (s *Service) Login(user *User) error {
+	retrievedUser, err := s.st.GetByUsername(user.Username)
+	if err != nil {
+		return err
+	}
+
+	if err := auth.VerifyPassword(user.Password, retrievedUser.Password); err != nil {
+		return err
+	}
+	return nil
+}

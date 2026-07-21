@@ -1,8 +1,10 @@
 package user
 
 import (
+	"errors"
 	"net/http"
 
+	"github.com/erwindrsno/PMVBD-CheckIn/internal/auth"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/responses"
 	"github.com/gin-gonic/gin"
 )
@@ -32,9 +34,21 @@ func (h *Handler) Create(c *gin.Context) {
 	}
 }
 
-// func (h *Handler) Login(c *gin.Context) {
-// 	var req struct {
-// 		Username string `json:"username" binding:"required"`
-// 		Password string `json:"password" binding:"required"`
-// 	}
-// }
+func (h *Handler) Login(c *gin.Context) {
+	var req User
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		responses.Fail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := h.s.Login(&req); err != nil {
+		if errors.Is(err, auth.ErrInvalidCredentials) {
+			responses.Fail(c, http.StatusUnauthorized, err.Error())
+		} else {
+			responses.Fail(c, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+	responses.Success(c, http.StatusOK, gin.H{"success": true})
+}
