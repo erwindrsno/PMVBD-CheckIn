@@ -1,0 +1,40 @@
+package user
+
+import (
+	"net/http"
+
+	"github.com/erwindrsno/PMVBD-CheckIn/internal/responses"
+	"github.com/gin-gonic/gin"
+)
+
+type Handler struct {
+	s *Service
+}
+
+func NewHandler(s *Service) *Handler {
+	h := &Handler{
+		s: s,
+	}
+	return h
+}
+
+func (h *Handler) Create(c *gin.Context) {
+	var req User
+	if err := c.ShouldBindJSON(&req); err != nil {
+		responses.Fail(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := h.s.Create(&req); err != nil {
+		responses.Fail(c, http.StatusBadRequest, err.Error())
+	} else {
+		responses.Success(c, http.StatusCreated, gin.H{"success": true})
+	}
+}
+
+// func (h *Handler) Login(c *gin.Context) {
+// 	var req struct {
+// 		Username string `json:"username" binding:"required"`
+// 		Password string `json:"password" binding:"required"`
+// 	}
+// }

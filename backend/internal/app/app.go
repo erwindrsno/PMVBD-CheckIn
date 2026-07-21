@@ -11,6 +11,7 @@ import (
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/grade"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/school"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/subgrade"
+	"github.com/erwindrsno/PMVBD-CheckIn/internal/user"
 
 	"github.com/gin-gonic/gin"
 
@@ -31,10 +32,10 @@ func New() *App {
 
 	router := gin.Default()
 
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:5173", "http://127.0.0.1:5173"}
-	router.Use(cors.New(config))
-	// router.Use(cors.Default())
+	// config := cors.DefaultConfig()
+	// config.AllowOrigins = []string{"http://localhost:5173", "http://127.0.0.1:5173"}
+	// router.Use(cors.New(config))
+	router.Use(cors.Default())
 
 	a := &App{
 		DB:     db,
@@ -82,6 +83,11 @@ func (a *App) setRoutes() {
 	attendanceService := attendance.NewService(attendanceStore, attendeeService)
 	attendanceHandler := attendance.NewHandler(attendanceService)
 
+	//user definition
+	userStore := user.NewSQLiteStore(a.DB)
+	userService := user.NewService(userStore)
+	userHandler := user.NewHandler(userService)
+
 	api := a.Router.Group("/api/v1")
 	{
 		schools := api.Group("/schools")
@@ -123,8 +129,12 @@ func (a *App) setRoutes() {
 			subgrades.GET("", subgradeHandler.Read)
 			subgrades.POST("", subgradeHandler.Create)
 		}
-	}
 
+		users := api.Group("/users")
+		{
+			users.POST("", userHandler.Create)
+		}
+	}
 }
 
 func (a *App) Run(port string) {
