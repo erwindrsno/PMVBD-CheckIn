@@ -92,6 +92,7 @@ func (a *App) setRoutes() {
 	userHandler := user.NewHandler(userService)
 
 	a.Router.POST("/api/v1/users/login", userHandler.Login)
+	a.Router.POST("/api/v1/users", userHandler.Create)
 	protected := a.Router.Group("/api/v1")
 	protected.Use(middleware.AuthMiddleware())
 	{
@@ -135,10 +136,10 @@ func (a *App) setRoutes() {
 			subgrades.POST("", subgradeHandler.Create)
 		}
 
-		users := protected.Group("/users")
-		{
-			users.POST("", userHandler.Create)
-		}
+		// users := protected.Group("/users")
+		// {
+		// 	users.POST("", userHandler.Create)
+		// }
 	}
 }
 

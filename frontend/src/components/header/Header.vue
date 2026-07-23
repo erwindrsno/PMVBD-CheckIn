@@ -4,8 +4,15 @@ import SchoolList from '@/components/schools/SchoolList.vue';
 import EventList from '@/components/events/EventList.vue';
 import AttendeeList from '@/components/attendees/AttendeeList.vue';
 import Capture from '@/components/attendances/Capture.vue';
+import { useRouter } from 'vue-router'
 
-const currentView = ref('attendee');
+const router = useRouter()
+
+const handleLogout = () => {
+  sessionStorage.removeItem('token')
+
+  router.push('/');
+}
 </script>
 
 <template>
@@ -40,6 +47,19 @@ const currentView = ref('attendee');
 
       <v-btn to="/events">Agenda</v-btn>
       <v-btn to="/schools">Sekolah</v-btn>
+
+      <v-menu>
+        <template v-slot:activator="{ props }">
+          <v-btn v-bind="props" append-icon="mdi-chevron-down">
+              User
+          </v-btn>
+        </template>
+
+        <v-list>
+          <!-- Remove the 'to' prop and use @click to trigger a custom logout function -->
+          <v-list-item @click="handleLogout" title="Log out" />
+        </v-list>
+      </v-menu>
     </template>
   </v-app-bar>
 </template>
