@@ -16,9 +16,26 @@ const headers = [
 const fetchSchools = async () => {
   loading.value = true;
   try {
-    const response = await fetch('http://localhost:8080/api/v1/schools');
+    // 1. Retrieve the token from localStorage
+    const token = sessionStorage.getItem('token');
+
+    const response = await fetch('http://localhost:8080/api/v1/schools', {
+      method: 'GET', // (GET is default, but good to be explicit)
+      headers: {
+        'Content-Type': 'application/json',
+        // 2. Attach the Bearer token
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // Optional: Handle unauthorized cases (e.g., if token expired)
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login'; // Or use router.push('/login')
+      return;
+    }
+
     const result = await response.json();
-    // Assuming backend returns { "data": { "schools": [...] } }
     schools.value = result.data.schools || [];
   } catch (error) {
     console.error('Error fetching schools:', error);
@@ -29,9 +46,13 @@ const fetchSchools = async () => {
 
 const saveSchool = async () => {
   try {
+    const token = sessionStorage.getItem('token');
     const response = await fetch('http://localhost:8080/api/v1/schools', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(newSchool.value),
     });
 

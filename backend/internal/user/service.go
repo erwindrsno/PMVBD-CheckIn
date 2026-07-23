@@ -38,6 +38,10 @@ func (s *Service) Login(user *User) error {
 		return err
 	}
 
+	if retrievedUser == nil {
+		return ErrInvalidCredentials
+	}
+
 	if err := auth.VerifyPassword(user.Password, retrievedUser.Password); err != nil {
 		return err
 	}

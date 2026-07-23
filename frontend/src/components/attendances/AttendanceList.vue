@@ -19,7 +19,12 @@ const headers = [
 
 // 1. Fetch available events for the dropdown
 const fetchEvents = async () => {
-  const res = await fetch('http://localhost:8080/api/v1/events');
+  const res = await fetch('http://localhost:8080/api/v1/events',{
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+    }
+  });
   const eventsListData = await res.json();
   events.value = eventsListData.data.events;
 };
@@ -32,7 +37,18 @@ const fetchAttendance = async () => {
   }
 
   // Update this to match the route you fixed (Path or Query)
-  const res = await fetch(`http://localhost:8080/api/v1/attendances/${selectedEvent.value}`);
+  const res = await fetch(`http://localhost:8080/api/v1/attendances/${selectedEvent.value}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+    }
+  });
+  if (res.status === 401) {
+    sessionStorage.removeItem('token');
+    window.location.href = '/login'; // Or use router.push('/login')
+    return;
+  }
   const attendanceData = await res.json();
   attendanceList.value = attendanceData.data.atvis || [];
 };
@@ -48,7 +64,16 @@ const confirmDelete = async () => {
   try {
     const response = await fetch(`http://localhost:8080/api/v1/attendances/${itemToDelete.value.attendance_id}`, {
       method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+      }
     });
+  if (response.status === 401) {
+    sessionStorage.removeItem('token');
+    window.location.href = '/login'; // Or use router.push('/login')
+    return;
+  }
     if (response.ok) {
       await fetchAttendance();
     }

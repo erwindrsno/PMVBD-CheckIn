@@ -55,9 +55,19 @@
   const confirmDelete = async () => {
     if (!itemToDelete.value) return;
     try {
+      const token = sessionStorage.getItem('token');
       const response = await fetch(`http://localhost:8080/api/v1/attendees/${itemToDelete.value.public_id}`, {
         method: 'DELETE',
+        headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+        },
       });
+      if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        window.location.href = '/login'; // Or use router.push('/login')
+        return;
+      }
       if (response.ok) {
         await fetchInitialData();
       }
@@ -73,20 +83,38 @@
     loading.value = true;
     try {
       // Fetch both simultaneously
+      const token = sessionStorage.getItem('token');
       const [attendeesRes, schoolsRes, gradesRes, subgradesRes] = await Promise.all([
-        fetch('http://localhost:8080/api/v1/attendees'),
-        fetch('http://localhost:8080/api/v1/schools'), // Replace with your actual schools endpoint
-        fetch('http://localhost:8080/api/v1/grades'), // Replace with your actual schools endpoint
-        fetch('http://localhost:8080/api/v1/subgrades') // Replace with your actual schools endpoint
+        fetch('http://localhost:8080/api/v1/attendees', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }),
+        fetch('http://localhost:8080/api/v1/schools', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }), // Replace with your actual schools endpoint
+        fetch('http://localhost:8080/api/v1/grades', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }), // Replace with your actual schools endpoint
+        fetch('http://localhost:8080/api/v1/subgrades', {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }) // Replace with your actual schools endpoint
       ]);
 
       const attendeesData = await attendeesRes.json();
-      console.log(attendeesData)
       const schoolsData = await schoolsRes.json();
       const gradesData = await gradesRes.json();
       const subgradesData = await subgradesRes.json();
-
-      console.log(schoolsData)
 
       attendees.value = attendeesData.data.attendees || [];
       schools.value = schoolsData.data.schools || []; // Assuming your API returns { data: { schools: [...] } }
@@ -100,11 +128,14 @@
   };
 
   const saveAttendee = async () => {
-    console.log(JSON.stringify(newAttendee.value))
     try {
+      const token = sessionStorage.getItem('token');
       const response = await fetch('http://localhost:8080/api/v1/attendees', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(newAttendee.value),
       });
 

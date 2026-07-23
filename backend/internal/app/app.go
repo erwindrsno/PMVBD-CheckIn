@@ -33,10 +33,12 @@ func New() *App {
 
 	router := gin.Default()
 
-	// config := cors.DefaultConfig()
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	// config.AllowOrigins = []string{"http://localhost:5173", "http://127.0.0.1:5173"}
 	// router.Use(cors.New(config))
-	router.Use(cors.Default())
+	router.Use(cors.New(config))
 
 	a := &App{
 		DB:     db,
@@ -90,7 +92,6 @@ func (a *App) setRoutes() {
 	userHandler := user.NewHandler(userService)
 
 	a.Router.POST("/api/v1/users/login", userHandler.Login)
-
 	protected := a.Router.Group("/api/v1")
 	protected.Use(middleware.AuthMiddleware())
 	{

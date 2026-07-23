@@ -43,7 +43,7 @@ func (h *Handler) Login(c *gin.Context) {
 	}
 
 	if err := h.s.Login(&req); err != nil {
-		if errors.Is(err, auth.ErrInvalidCredentials) {
+		if errors.Is(err, auth.ErrInvalidCredentials) || errors.Is(err, ErrInvalidCredentials) {
 			responses.Fail(c, http.StatusUnauthorized, err.Error())
 		} else {
 			responses.Fail(c, http.StatusInternalServerError, err.Error())

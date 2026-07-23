@@ -3,5 +3,6 @@ package user
 import "errors"
 
 var (
-	ErrInternal = errors.New("Something went wrong!!!")
+	ErrInternal           = errors.New("Something went wrong!!!")
+	ErrInvalidCredentials = errors.New("Invalid credentials!")
 )

@@ -20,10 +20,21 @@ const showSnackbar = (text, color = 'success') => {
 const fetchOpenEvents = async () => {
   try {
     // Make sure the URL matches your route group /api/v1/events
-    const response = await fetch('http://localhost:8080/api/v1/events?status=open');
+    const response = await fetch('http://localhost:8080/api/v1/events?status=open',{
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+    }
+    });
+    if (response.status === 401) {
+      sessionStorage.removeItem('token');
+      window.location.href = '/login'; // Or use router.push('/login')
+      return;
+    }
     if (!response.ok) throw new Error('Failed to fetch events');
 
     const results = await response.json();
+    console.log(results)
 
     // Assuming your API returns { "events": [...] } based on your handler
     events.value = results.data.events || [];
@@ -42,6 +53,7 @@ const handleScan = async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
       },
       body: JSON.stringify({
         attendee_id: inputID.value,
