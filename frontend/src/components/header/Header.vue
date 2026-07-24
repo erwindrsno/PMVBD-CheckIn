@@ -20,7 +20,7 @@ const handleLogout = () => {
     <v-app-bar-title>
       <div class="d-flex align-center" style="min-width: 250px;">
         <v-img
-          src="../assets/LOGO_PMV.PNG"
+          src="/assets/LOGO_PMV.PNG"
           width="50"
           height="50"
           class="mr-3 flex-grow-0"

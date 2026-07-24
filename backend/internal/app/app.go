@@ -2,7 +2,9 @@ package app
 
 import (
 	"database/sql"
+	"fmt"
 	"log/slog"
+	"os"
 
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/attendance"
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/attendee"
@@ -25,10 +27,11 @@ type App struct {
 }
 
 func New() *App {
-	dbPath := "pmvbd-checkin-dev.db"
+	dbName := os.Getenv("DB_NAME")
+	dbPath := fmt.Sprintf("/backend/data/%s", dbName)
 	db, err := database.InitDB(dbPath)
 	if err != nil {
-		slog.Error(err.Error())
+		slog.Error("Error during starting db: ", "error", err.Error())
 	}
 
 	router := gin.Default()

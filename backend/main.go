@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 
 	"github.com/erwindrsno/PMVBD-CheckIn/internal/app"
@@ -13,7 +13,7 @@ func main() {
 	//First of all, remember to clear tmp files before running the app. If not, configuring line 17 to the path is necessary
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		slog.Info("NO .env file found, relying on system env variable.")
 	}
 
 	server := app.New()

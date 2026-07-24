@@ -42,5 +42,6 @@ frontend/*.timestamp-*-*.mjs
 backend/*.db
 backend/.env
 backend/tmp/main
+backend/data
 
 .DS_Store
