@@ -4,6 +4,7 @@
   import DeleteConfirmDialog from './DeleteConfirmDialog.vue';
 
   // --- State ---
+  const search = ref('');
   const dialog = ref(false);
   const detailDialog = ref(false); // Add this
   const loading = ref(false);
@@ -165,13 +166,30 @@
 <template>
   <div class="d-flex justify-space-between align-center mb-4">
     <h1>Daftar peserta</h1>
-    <v-btn color="primary" @click="dialog = true">Tambah peserta baru</v-btn>
+
+    <div class="d-flex align-center ga-3" style="min-width: 500px;">
+      <!-- 2. Search Text Field -->
+      <v-text-field
+        v-model="search"
+        prepend-inner-icon="mdi-magnify"
+        label="Cari peserta..."
+        variant="outlined"
+        density="compact"
+        hide-details
+        clearable
+        single-line
+        style="width: 100%;"
+      ></v-text-field>
+
+      <v-btn color="primary" @click="dialog = true">Tambah peserta baru</v-btn>
+    </div>
   </div>
 
   <v-data-table
     :headers="headers"
     :items="attendees"
     :loading="loading"
+    :search="search"
     class="elevation-1"
   >
     <!-- Index -->
