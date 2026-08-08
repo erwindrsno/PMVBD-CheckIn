@@ -17,6 +17,9 @@ FROM nginx:alpine
 # Copy the built static assets from the builder stage to Nginx's public folder
 COPY --from=builder /frontend/dist /usr/share/nginx/html
 
+# Copy custom Nginx configuration to handle Vue SPA client-side routing
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Expose port 80 inside the container
 EXPOSE 80
 
