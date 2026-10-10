@@ -29,9 +29,9 @@ type App struct {
 func New() *App {
 	dbName := os.Getenv("DB_NAME")
 	// local
-	// dbPath := fmt.Sprintf("data/%s", dbName)
+	dbPath := fmt.Sprintf("data/%s", dbName)
 	// container
-	dbPath := fmt.Sprintf("/backend/data/%s", dbName)
+	// dbPath := fmt.Sprintf("/backend/data/%s", dbName)
 	db, err := database.InitDB(dbPath)
 	if err != nil {
 		slog.Error("Error during starting db: ", "error", err.Error())

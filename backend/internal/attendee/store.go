@@ -80,7 +80,8 @@ func (s *SQLiteStore) GetPaginatedListView(limit, offset int) ([]AttendeeViewIte
 
 func (s *SQLiteStore) GetListView() ([]AttendeeViewItem, error) {
 	query := `
-		SELECT a.name, a.public_id, s.name, g.label, sg.name, a.contact_number, a.guardian_contact_number
+		SELECT a.name, a.public_id, s.name, g.label, sg.name, a.contact_number, a.guardian_contact_number,
+		(SELECT COUNT(*) FROM attendances att WHERE att.attendee_id = a.public_id) AS attendance_count
 		FROM attendees a
 		JOIN schools s ON s.id = a.school_id
 		JOIN grades g ON g.id = a.grade_id 
@@ -96,7 +97,7 @@ func (s *SQLiteStore) GetListView() ([]AttendeeViewItem, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var avi AttendeeViewItem
-		if err := rows.Scan(&avi.Name, &avi.PublicId, &avi.SchoolName, &avi.Grade, &avi.Subgrade, &avi.ContactNumber, &avi.GuardianContactNumber); err != nil {
+		if err := rows.Scan(&avi.Name, &avi.PublicId, &avi.SchoolName, &avi.Grade, &avi.Subgrade, &avi.ContactNumber, &avi.GuardianContactNumber, &avi.AttendanceCount); err != nil {
 			return nil, err
 		}
 		avis = append(avis, avi)
@@ -106,7 +107,8 @@ func (s *SQLiteStore) GetListView() ([]AttendeeViewItem, error) {
 
 func (s *SQLiteStore) GetByPublicId(publicId string) (*AttendeeViewItem, error) {
 	query := `
-			SELECT a.name, a.public_id, s.name, g.label, sg.name, a.contact_number, a.guardian_contact_number
+			SELECT a.name, a.public_id, s.name, g.label, sg.name, a.contact_number, a.guardian_contact_number,
+			(SELECT COUNT(*) FROM attendances att WHERE att.attendee_id = a.public_id) AS attendance_count
 			FROM attendees a
 			JOIN schools s ON s.id = a.school_id
 			JOIN grades g ON g.id = a.grade_id 
@@ -124,6 +126,7 @@ func (s *SQLiteStore) GetByPublicId(publicId string) (*AttendeeViewItem, error) 
 		&avi.Subgrade,
 		&avi.ContactNumber,
 		&avi.GuardianContactNumber,
+		&avi.AttendanceCount,
 	)
 
 	if err != nil {

@@ -19,24 +19,20 @@ const showSnackbar = (text, color = 'success') => {
 // Function to fetch events from your API
 const fetchOpenEvents = async () => {
   try {
-    // Make sure the URL matches your route group /api/v1/events
     const response = await fetch('http://localhost:8080/api/v1/events?status=open',{
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-    }
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+      }
     });
     if (response.status === 401) {
       sessionStorage.removeItem('token');
-      window.location.href = '/login'; // Or use router.push('/login')
+      window.location.href = '/login';
       return;
     }
     if (!response.ok) throw new Error('Failed to fetch events');
 
     const results = await response.json();
-    console.log(results)
-
-    // Assuming your API returns { "events": [...] } based on your handler
     events.value = results.data.events || [];
   } catch (error) {
     console.error("Error loading events:", error);
@@ -44,11 +40,9 @@ const fetchOpenEvents = async () => {
 };
 
 const handleScan = async () => {
-  // 1. Safety checks
   if (!inputID.value || !selectedEvent.value) return;
 
   try {
-    // 2. Perform the POST request
     const response = await fetch('http://localhost:8080/api/v1/attendances', {
       method: 'POST',
       headers: {
@@ -57,36 +51,31 @@ const handleScan = async () => {
       },
       body: JSON.stringify({
         attendee_id: inputID.value,
-        event_id: selectedEvent.value.id, // Ensure this matches your Go struct
+        event_id: selectedEvent.value.id,
       }),
     });
 
     if (response.status === 409) {
-      const result = await response.json();
-
       showSnackbar('Kehadiran peserta bersangkutan telah direkam sebelumnya.', 'warning');
-      inputID.value = ''; // Clear input
+      inputID.value = '';
       return;
-    } else if(response.status === 404){
+    } else if (response.status === 404){
       showSnackbar(`Peserta dengan ID '${inputID.value}' tidak ditemukan.`, 'error');
-      inputID.value = ''; // Clear input
+      inputID.value = '';
       return;
     }
 
     const result = await response.json();
 
-    console.log(result)
-
-    // 3. Update the UI with response data
     currentAttendee.value = {
-      name: result.data.avi.name, // Assuming your API returns attendee details
+      name: result.data.avi.name,
       public_id: inputID.value,
       school: result.data.avi.school,
       grade: result.data.avi.grade,
       subgrade: result.data.avi.subgrade,
+      attendance_count: result.data.avi.attendance_count,
     };
 
-    // 4. Clear input for next scan
     inputID.value = '';
 
   } catch (error) {
@@ -94,7 +83,6 @@ const handleScan = async () => {
     alert("Error: " + error.message);
   }
 };
-
 
 onMounted(() => {
   fetchOpenEvents();
@@ -111,36 +99,47 @@ onMounted(() => {
       :items="events"
       item-title="name"
       item-value="id"
-      label='Pilih agenda yang sedang terbuka'
+      label="Pilih agenda yang sedang terbuka"
       variant="outlined"
       class="mb-4"
       prepend-inner-icon="mdi-calendar-check"
       return-object
     ></v-select>
 
-    <!-- State Display -->
+    <!-- State Display Card -->
     <v-card class="mb-6" min-height="200">
       <v-card-text class="pa-3">
+
+        <!-- Waiting State -->
         <div v-if="!currentAttendee" class="text-center mt-10 text-grey">
           <v-icon size="64" color="grey-lighten-1" class="mb-4">mdi-qrcode-scan</v-icon>
           <p class="text-h6">Sedang menunggu input...</p>
           <p>Mohon untuk memilih sebuah agenda dan memindai kode QR.</p>
-
         </div>
 
+        <!-- Success State -->
         <div v-else>
           <h2 class="text-h5 mb-4 text-primary text-center">Peserta ditemukan!</h2>
+
           <v-list density="comfortable">
             <v-list-item title="Nama" :subtitle="currentAttendee.name"></v-list-item>
             <v-list-item title="ID" :subtitle="currentAttendee.public_id"></v-list-item>
             <v-list-item title="Sekolah" :subtitle="currentAttendee.school"></v-list-item>
             <v-list-item title="Kelas" :subtitle="`${currentAttendee.grade} - ${currentAttendee.subgrade}`"></v-list-item>
           </v-list>
+
+          <v-card variant="tonal" color="primary" class="mb-2 text-center pa-2">
+            <div class="text-subtitle-1">Anda telah hadir ke kebhaktian sebanyak</div>
+            <div class="font-weight-bold my-1" style="font-size: 2rem; line-height: 1.2;">
+              {{ currentAttendee.attendance_count + 1 || 0 }} kali
+            </div>
+          </v-card>
         </div>
+
       </v-card-text>
     </v-card>
 
-    <!-- Input Section -->
+    <!-- Input Section (Moved OUTSIDE the state card so it stays accessible) -->
     <v-text-field
       v-model="inputID"
       label="Scan atau masukkan ID Peserta"
@@ -150,6 +149,7 @@ onMounted(() => {
       @keyup.enter="handleScan"
       :disabled="!selectedEvent"
     ></v-text-field>
+
   </v-container>
 
   <v-snackbar
@@ -158,7 +158,7 @@ onMounted(() => {
     location="top"
     timeout="5000"
   >
-      {{ snackbar.text }}
+    {{ snackbar.text }}
 
     <template v-slot:actions>
       <v-btn color="white" variant="text" @click="snackbar.show = false">

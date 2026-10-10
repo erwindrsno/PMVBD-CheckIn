@@ -6,6 +6,7 @@ import Capture from '@/components/attendances/Capture.vue';
 import AttendanceList from '@/components/attendances/AttendanceList.vue';
 import Login from '@/components/login/Login.vue';
 import ProtectedLayout from '@/components/layout/ProtectedLayout.vue';
+import Scoreboard from '@/components/attendances/Scoreboard.vue';
 
 
 const routes = [
@@ -44,6 +45,11 @@ const routes = [
         path: 'schools',
         component: SchoolList,
         meta: { title: 'Schools | PMVBD' }
+      },
+      {
+        path: 'attendances/scoreboard',
+        component: Scoreboard,
+        meta: { title: 'Scoreboard | PMVBD' }
       },
       // Optional: Root redirect to attendees when visiting "/"
       {

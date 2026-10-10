@@ -42,6 +42,7 @@ const handleLogout = () => {
         <v-list>
           <v-list-item to="/attendances/capture" title="Rekam Kehadiran" />
           <v-list-item to="/attendances/list" title="Daftar Kehadiran" />
+          <v-list-item to="/attendances/scoreboard" title="Scoreboard" />
         </v-list>
       </v-menu>
 

@@ -9,6 +9,7 @@ type AttendeeViewItem struct {
 	Subgrade              string `json:"subgrade"`
 	ContactNumber         string `json:"telp"`
 	GuardianContactNumber string `json:"guardian_telp"`
+	AttendanceCount       int    `json:"attendance_count"`
 }
 
 // http DTO
